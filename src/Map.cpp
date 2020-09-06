@@ -7,6 +7,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+#ifdef DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include "spdlog/spdlog.h"
+
 Map::Map(const std::string &fName, 
 				const std::vector<std::vector<float>> &mapData,
 				const int &xSize,
@@ -52,7 +57,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 				ss>>resolution;
 				if (ss.fail())
 					throw "Invalid Resolution provided";
-				std::cout<<resolution<<std::endl;
+				SPDLOG_INFO("RESOLUTION: {}", resolution);
 			}
 			else if (line.compare(0, 35, "robot_specifications->autoshifted_y") == 0)
 			{
@@ -61,7 +66,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 				ss>>autoshifted_y;
 				if (ss.fail())
 					throw "Invalid Autoshifted Y value provided";
-				std::cout<<autoshifted_y<<std::endl;
+				SPDLOG_INFO("AUTOSHIFTED Y: {}", autoshifted_y);
 			}
 			else if (line.compare(0, 35, "robot_specifications->autoshifted_x") == 0)
 			{
@@ -70,7 +75,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 				ss>>autoshifted_x;
 				if (ss.fail())
 					throw "Invalid Autoshifted X value provided";
-				std::cout<<autoshifted_x<<std::endl;
+				SPDLOG_INFO("AUTOSHIFTED X: {}", autoshifted_x);
 			}
 		}
 		if (line.compare(0, 13, "global_map[0]")==0)
@@ -81,13 +86,12 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 			ss>>temp>>mapsize_x>>mapsize_y;
 			if (ss.fail())
 				throw "Invalid Map size provided";
-			std::cout<<"Map Size :"<<mapsize_x<<" "<<mapsize_y<<std::endl;
+			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_x, mapsize_y);
 		}
 	}
 	catch (const char *msg)
 	{
-		std::cout<<"Exception Ocurred!\n"<<msg<<std::endl;
-		std::cout<<"Exiting Program"<<std::endl;
+		SPDLOG_ERROR("{}",msg);
 		exit(1);
 	}
 
@@ -96,23 +100,30 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 	// we expect mapsize_x number of rows and mapsize_y number of columns in the input
 	try
 	{
+		int count = 0;
 		for (int i = 0; i < mapsize_x; i++)
 		{
 			for (int j = 0; j < mapsize_y; j++)
 			{
 				if (!(fsm>>word))
 					throw "File did not have the required number of values!";
+
 				ss.clear();
 				ss<<word;
 				if (!(ss>>mapData[i][j]))
 					throw "The file had non-float data";
+
+				if ((count++ % 50000) == 0)
+				{
+					float percentage = 100*(count)/(float)(mapsize_x*mapsize_y);
+					SPDLOG_INFO("{:3.2f} reading completed",percentage);
+				}
 			}
 		}
 	}
 	catch (const char *msg)
 	{
-		std::cout<<"Exception Ocurred!\n"<<msg<<std::endl;
-		std::cout<<"Exiting Program"<<std::endl;
+		SPDLOG_ERROR("{}",msg);
 		exit(1);
 	}
 

@@ -1,4 +1,5 @@
 #include "LogReader.hpp"
+#include "spdlog/spdlog.h"
 #include <sstream>
 
 LogReader::LogReader(const std::string &fName) : fsm(fName)
@@ -10,8 +11,7 @@ LogReader::LogReader(const std::string &fName) : fsm(fName)
 	}
 	catch (const char *msg)
 	{
-		std::cout<<"Exception Ocurred!\n"<<msg<<std::endl;
-		std::cout<<"Exiting Program"<<std::endl;
+		SPDLOG_ERROR("{}",msg);
 		exit(1);
 	}
 };
@@ -19,28 +19,34 @@ LogReader::LogReader(const std::string &fName) : fsm(fName)
 Log getOdometryLog(std::stringstream &ss)
 {
 	double ts,x,y,theta;
+
 	if (!(ss>>x>>y>>theta>>ts))
 		throw "Proper Laser log was not provided";
-	return Log(LogType::ODOM, x, y, theta, {}, ts);
+
+	return Log(LogType::ODOM, x, y, theta, -1, -1, -1, ts, {});
 }
 
 Log getLaserLog(std::stringstream &ss)
 {
-	std::vector<int> data(180);
-	double ts,x,y,theta;
+	std::vector<int> data(LASER_SIZE);
+	double ts,x,y,theta,xl,yl,thetal;
 	int val;
 
-	if (!(ss>>x>>y>>theta))
+	if (!(ss>>x>>y>>theta>>xl>>yl>>thetal))
 		throw "Proper Laser log was not provided";
 
-	for (int i = 0; i < 180; i++)
+	for (int i = 0; i < LASER_SIZE; i++)
 	{
 		if (!(ss>>val))
 			throw "Proper Laser log was not provided";
 		else
 			data[i] = val;
 	}
-	return Log(LogType::ODOM, x, y, theta, std::move(data), ts);
+
+	if (!(ss>>ts))
+		throw "Timestamp not provided in laser log";
+
+	return Log(LogType::LASER, x, y, theta, xl, yl, thetal, ts, data);
 }
 
 boost::optional<Log> LogReader::getLog()
@@ -68,8 +74,7 @@ boost::optional<Log> LogReader::getLog()
 	}
 	catch (const char *msg)
 	{
-		std::cout<<"Exception Ocurred!\n"<<msg<<std::endl;
-		std::cout<<"Exiting Program"<<std::endl;
+		SPDLOG_ERROR("{}",msg);
 		exit(1);
 	}
 	return boost::optional<Log>();
