@@ -25,18 +25,11 @@ class Map
 				const int &ySize,
 				const int &res,
 				const int &autoX,
-				const int &autoY) : 
-			fileName(fName),
-			data(mapData),
-			mapSizeX(xSize),
-			mapSizeY(ySize),
-			resolution(res),
-			autoshiftedX(autoX),
-			autoshiftedY(autoY)
-		{};
+				const int &autoY);
 		// copy and move constructors are default, don't see any reason to define them.
 		// destructor is default, all data is stl and will be safely deleted
 };
 
 
 std::shared_ptr<Map> makeMap(const std::string &fName);
+void visualizeMap(const std::shared_ptr<Map> map);

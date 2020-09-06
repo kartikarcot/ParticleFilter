@@ -2,6 +2,25 @@
 #include <fstream>
 #include <memory>
 #include <sstream>
+#include "opencv2/core/hal/interface.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
+Map::Map(const std::string &fName, 
+				const std::vector<std::vector<float>> &mapData,
+				const int &xSize,
+				const int &ySize,
+				const int &res,
+				const int &autoX,
+				const int &autoY) : 
+			fileName(fName),
+			data(mapData),
+			mapSizeX(xSize),
+			mapSizeY(ySize),
+			resolution(res),
+			autoshiftedX(autoX),
+			autoshiftedY(autoY){};
 
 inline bool keepGoing(std::fstream &fsm, std::string &line)
 {
@@ -16,7 +35,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 	int resolution;
 	int autoshifted_x;
 	int autoshifted_y;
-	std::string line;
+	std::string line, word;
 	std::stringstream ss;
 
 	if (fsm.fail())
@@ -81,10 +100,10 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 		{
 			for (int j = 0; j < mapsize_y; j++)
 			{
-				if (!(fsm>>line))
+				if (!(fsm>>word))
 					throw "File did not have the required number of values!";
 				ss.clear();
-				ss<<line;
+				ss<<word;
 				if (!(ss>>mapData[i][j]))
 					throw "The file had non-float data";
 			}
@@ -96,6 +115,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 		std::cout<<"Exiting Program"<<std::endl;
 		exit(1);
 	}
+
 	return std::make_shared<Map>(
 			fName, 
 			mapData,
@@ -106,5 +126,18 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 			autoshifted_y);
 }
 
+void visualizeMap(const std::shared_ptr<Map> map)
+{
+	cv::Mat mat;
+	mat.create(map->data.size(), map->data[0].size(), CV_64FC1);
+
+	for (int i = 0; i < map->data.size(); i++)
+		for (int j = 0; j < map->data[i].size(); j++)
+			mat.at<double>(i,j) = map->data[i][j];
+
+	cv::namedWindow("Map Preview", cv::WINDOW_AUTOSIZE);
+	cv::imshow("Map Preview", mat);
+	cv::waitKey(0);
+}
 // Usage
 // std::shared_ptr<Map> mp = makeMap("../data/map/wean.dat");
