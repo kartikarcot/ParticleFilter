@@ -4,7 +4,7 @@
 inline bool is_freespace(float x, float y, std::shared_ptr<Map> mp)
 {
     auto x_cell=int(x/mp->resolution), y_cell=int(y/mp->resolution);
-    return true;//(mp->data[x_cell,y_cell] < 0.5 && mp->data[x_cell,y_cell] > 0.0);
+    return true;//(mp->data[x_cell,y_cell] < 0.5 && mp->data[x_cell,y_cell] > 0.0); <- causing errors
 }
 
 ParticleFilter::ParticleFilter(const size_t num_particles, std::shared_ptr<Map> mp) : num_particles(num_particles)
@@ -19,14 +19,14 @@ ParticleFilter::ParticleFilter(const size_t num_particles, std::shared_ptr<Map> 
         
         if(is_freespace(x,y,mp))
         {
-            particles.emplace_back(Particle{ x, y, theta, 1/double(num_particles)});
+            particles.emplace_back(Particle{ Pose2D{x, y, theta}, 1/double(num_particles)});
             num_generated++;
         }
     }
     
 }
 
-State ParticleFilter::predict(State& x_t)
+void ParticleFilter::predict()
 {
     throw "Not implemented yet";
 }
