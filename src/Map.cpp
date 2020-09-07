@@ -12,6 +12,7 @@
 #endif
 #include "spdlog/spdlog.h"
 
+// @TODO: 
 Map::Map(const std::string &fName, 
 				const std::vector<std::vector<float>> &mapData,
 				const int &xSize,
@@ -25,7 +26,13 @@ Map::Map(const std::string &fName,
 			mapSizeY(ySize),
 			resolution(res),
 			autoshiftedX(autoX),
-			autoshiftedY(autoY){};
+			autoshiftedY(autoY)
+			{
+				minX=0.0;
+				minY=0.0;
+				maxX=xSize;
+				maxY=ySize;
+			}
 
 inline bool keepGoing(std::fstream &fsm, std::string &line)
 {

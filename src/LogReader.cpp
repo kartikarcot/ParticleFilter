@@ -45,7 +45,7 @@ Log getLaserLog(std::stringstream &ss)
 
 	if (!(ss>>ts))
 		throw "Timestamp not provided in laser log";
-
+	
 	return Log(LogType::LASER, x, y, theta, xl, yl, thetal, ts, data);
 }
 

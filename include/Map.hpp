@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string.h>
 #include <vector>
@@ -9,9 +10,17 @@ class Map
 	public:
 		const std::string fileName;
 		const std::vector<std::vector<float>> data;
+		
+		//
 		const int mapSizeX;
 		const int mapSizeY;
+
+		double minX, minY, maxX, maxY;
+		
+		//
 		const int resolution;
+
+		//
 		const int autoshiftedX;
 		const int autoshiftedY; 
 		// delete default constructor
