@@ -4,7 +4,7 @@
 #include <random>
 #include <memory>
 #include <Map.hpp>
-
+//std::default_random_engine generator;//@TODO: Fix the redefinition error on using single gen, should not need two generators in two classes
 struct Pose2D
 {
     double x, y, theta;
@@ -19,6 +19,8 @@ struct Particle
 class ParticleFilter
 {
 public:
+    
+    std::default_random_engine generator;
     const size_t num_particles;
 
     std::vector<Particle> particles;
