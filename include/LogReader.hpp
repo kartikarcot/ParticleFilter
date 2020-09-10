@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LOGREADER_H
+#define LOGREADER_H
+
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -47,3 +49,5 @@ class LogReader
 		// we wish to retain move constructor. with default semantics.
 		boost::optional<Log> getLog();
 };
+
+#endif

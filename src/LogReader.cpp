@@ -1,6 +1,10 @@
 #include "LogReader.hpp"
-#include "spdlog/spdlog.h"
 #include <sstream>
+
+#ifdef DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include "spdlog/spdlog.h"
 
 LogReader::LogReader(const std::string &fName) : fsm(fName)
 {

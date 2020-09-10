@@ -18,7 +18,7 @@ class Map
 		int mapSizeX;
 		int mapSizeY;
 
-		double minX, minY, maxX, maxY;
+		int minX, minY, maxX, maxY;
 		
 		int resolution;
 

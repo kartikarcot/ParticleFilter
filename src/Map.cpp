@@ -28,8 +28,9 @@ Map::Map(const std::string &fName,
 			autoshiftedX(autoX),
 			autoshiftedY(autoY)
 			{
-				minX=0.0;
-				minY=0.0;
+				SPDLOG_INFO("The size of the data vector is {} {}", mapData.size(), mapData[0].size());
+				minX=0;
+				minY=0;
 				maxX=xSize;
 				maxY=ySize;
 			}

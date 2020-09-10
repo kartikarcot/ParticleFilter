@@ -27,14 +27,14 @@ class ParticleFilter
 public:
     
     std::default_random_engine generator;
-    const size_t num_particles;
+    const size_t numParticles;
 
     std::vector<Particle> particles;
 
     std::vector<double> weights;
 
     // Initialise the particle filter
-    ParticleFilter(const size_t num_particles, std::shared_ptr<Map> mp);
+    ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp);
 
     /* predict the state for the next time step
 	 *   using the motion model.

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef RESAMPLER_H
+#define RESAMPLER_H
+
 #include<ParticleFilter.hpp>
 
 class Resampler
@@ -15,3 +17,5 @@ class Resampler
         void multinomial_sampling(std::vector<Particle>& particles);
         
 };
+
+#endif

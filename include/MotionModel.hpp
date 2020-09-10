@@ -1,24 +1,26 @@
-#pragma once
+#ifndef MOTIONMODEL_H
+#define MOTIONMODEL_H
+
 #include<ParticleFilter.hpp>
 #include <cmath>
 
 struct OdomModelNoise
 {
     
-    double rot1_var;
-    double trans_var;
-    double rot2_var;
+    double rot1Var;
+    double transVar;
+    double rot2Var;
     
     
     //Assume a gaussian noise for each of the motions
     std::vector<std::normal_distribution<double>> dists;
 
-    OdomModelNoise(double rot1_noise, double trans_noise, double rot2_noise): 
-    rot1_var(rot1_noise),trans_var(trans_noise),rot2_var(rot2_noise)
+    OdomModelNoise(double _rot1Var, double _transVar, double _rot2Var): 
+    rot1Var(_rot1Var),transVar(_transVar),rot2Var(_rot2Var)
     {
-        dists.push_back(std::normal_distribution<double>(0.0,rot1_var));
-        dists.push_back(std::normal_distribution<double>(0.0,trans_var));
-        dists.push_back(std::normal_distribution<double>(0.0,rot2_var));
+        dists.push_back(std::normal_distribution<double>(0.0,rot1Var));
+        dists.push_back(std::normal_distribution<double>(0.0,transVar));
+        dists.push_back(std::normal_distribution<double>(0.0,rot2Var));
     }
 };
 
@@ -26,9 +28,11 @@ struct OdomModelNoise
 class MotionModel
 {
 
-    OdomModelNoise process_noise;
+    OdomModelNoise processNoise;
     public:
-    MotionModel(double rot1_var,double trans_var,double rot2_var);
-    void predictOdometryModel(Particle& p, Pose2D& u_t0, Pose2D& u_t1);
+    MotionModel(double _rot1Var,double _transVar,double _rot2Var);
+    void predictOdometryModel(Particle& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure);
 
 };
+
+#endif
