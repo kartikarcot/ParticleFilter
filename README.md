@@ -6,6 +6,7 @@ cmake -DCMAKE_OSX_SYSROOT="/" ../code/
 mv compile_commands.json ../code
 ```
 ## Add this to .bashrc to make development easier
+* Change the path variable
 ```
 function pf() {
 	path="/Users/stark/Projects/16833_HW1_ParticleFilter"
