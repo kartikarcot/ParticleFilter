@@ -1,13 +1,19 @@
-#pragma once
+#ifndef PARTICLEFILTER_H
+#define PARTICLEFILTER_H
+
 #include <iostream>
 #include <vector>
 #include <random>
 #include <memory>
 #include <Map.hpp>
 //std::default_random_engine generator;//@TODO: Fix the redefinition error on using single gen, should not need two generators in two classes
+class Map;
+
 struct Pose2D
 {
     double x, y, theta;
+	Pose2D(double _x, double _y, double _theta) : x(_x), y(_y), theta(_theta) {}
+	Pose2D() : x(-1.0), y(-1.0), theta(-1.0) {}
 };
 
 struct Particle
@@ -46,3 +52,5 @@ public:
     */
     void resample();
 };
+
+#endif

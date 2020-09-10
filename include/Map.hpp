@@ -1,32 +1,31 @@
-#pragma once
+#ifndef MAP_H
+#define MAP_H
+
 #include <iostream>
 #include <string.h>
 #include <vector>
 #include <memory>
 #include <utility>
+#include <ParticleFilter.hpp>
+struct Particle;
 
 class Map
 {
 	public:
-		const std::string fileName;
-		const std::vector<std::vector<float>> data;
+		std::string fileName;
+		std::vector<std::vector<float>> data;
 		
-		//
-		const int mapSizeX;
-		const int mapSizeY;
+		int mapSizeX;
+		int mapSizeY;
 
 		double minX, minY, maxX, maxY;
 		
-		//
-		const int resolution;
+		int resolution;
 
-		//
-		const int autoshiftedX;
-		const int autoshiftedY; 
+		int autoshiftedX;
+		int autoshiftedY; 
 		// delete default constructor
 		Map() = delete;
-		// delete copy assignment operation explicitly since all data is const
-		Map& operator= (const Map &rhs) = delete;
 		// declare custom constructor
 		Map(const std::string &fName, 
 				const std::vector<std::vector<float>> &mapData,
@@ -41,4 +40,6 @@ class Map
 
 
 std::shared_ptr<Map> makeMap(const std::string &fName);
-void visualizeMap(const std::shared_ptr<Map> map);
+void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Particle> &particleVector = {});
+
+#endif

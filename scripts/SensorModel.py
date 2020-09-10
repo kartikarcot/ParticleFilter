@@ -30,7 +30,7 @@ class SensorModel:
         """
         TODO : Add your code here
         """
-
+        q = 0
         return q    
  
 if __name__=='__main__':

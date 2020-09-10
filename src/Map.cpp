@@ -144,18 +144,28 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 			autoshifted_y);
 }
 
-void visualizeMap(const std::shared_ptr<Map> map)
+void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Particle> &particleVector)
 {
 	cv::Mat mat;
-	mat.create(map->data.size(), map->data[0].size(), CV_64FC1);
+	mat.create(map->data.size(), map->data[0].size(), CV_64FC3);
 
 	for (int i = 0; i < map->data.size(); i++)
+	{
 		for (int j = 0; j < map->data[i].size(); j++)
-			mat.at<double>(i,j) = map->data[i][j];
+		{
+			double grayCode = map->data[i][j];
+			mat.at<cv::Vec3d>(i,j) = cv::Vec3d(grayCode, grayCode, grayCode);
+		}
+	}
+
+	for (const auto &particle : particleVector)
+	{
+		cv::circle(mat, cv::Point2d(particle.pose.x, particle.pose.y), 1, cv::Scalar(0,0,255), -1); 
+	}
 
 	cv::namedWindow("Map Preview", cv::WINDOW_AUTOSIZE);
 	cv::imshow("Map Preview", mat);
-	cv::waitKey(0);
+	cv::waitKey(1);
 }
 // Usage
 // std::shared_ptr<Map> mp = makeMap("../data/map/wean.dat");

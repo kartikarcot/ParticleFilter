@@ -27,7 +27,7 @@ class MotionModel:
         """
         TODO : Add your code here
         """
-
+        x_t1 = x_t0
         return x_t1
 
 if __name__=="__main__":

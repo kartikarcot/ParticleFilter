@@ -21,14 +21,14 @@ struct OdomModelNoise
         dists.push_back(std::normal_distribution<double>(0.0,rot2_var));
     }
 };
+
+
 class MotionModel
 {
-    
+
     OdomModelNoise process_noise;
     public:
     MotionModel(double rot1_var,double trans_var,double rot2_var);
-
     void predictOdometryModel(Particle& p, Pose2D& u_t0, Pose2D& u_t1);
-
 
 };
