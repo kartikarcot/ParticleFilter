@@ -55,12 +55,12 @@ int main(int argc, char **argv)
 
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
-		for (auto &particle : particleFilter.particles)
+		for (auto &particlePose : particleFilter.particles)
 		{
 			// Motion Model update
-			SPDLOG_DEBUG("The particle before update {} {} {}", particle.pose.x, particle.pose.y, particle.pose.theta);
-			motionModel.predictOdometryModel(particle, odomPreviousMeasure, odomCurrentMeasure);
-			SPDLOG_DEBUG("The particle after update {} {} {}", particle.pose.x, particle.pose.y, particle.pose.theta);
+			SPDLOG_DEBUG("The particle before update {} {} {}", particlePose.x, particlePose.y, particlePose.theta);
+			motionModel.predictOdometryModel(particlePose, odomPreviousMeasure, odomCurrentMeasure);
+			SPDLOG_DEBUG("The particle after update {} {} {}", particlePose.x, particlePose.y, particlePose.theta);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
@@ -68,11 +68,13 @@ int main(int argc, char **argv)
 				sensorModel.rayCasting(
 						log->laserPose,
 						odomCurrentMeasure,
-						particle.pose,
+						particlePose,
 						worldMap);
 			}
 		}
-		odomPreviousMeasure = odomPreviousMeasure;
+		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
+		odomPreviousMeasure = odomCurrentMeasure;
+		particleFilter.resample();
 		visualizeMap(worldMap, particleFilter.particles);
 	}
 	return 0;

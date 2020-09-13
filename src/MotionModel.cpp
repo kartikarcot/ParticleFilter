@@ -8,7 +8,7 @@
 MotionModel::MotionModel(double rot1Var, double transVar, double rot2Var) : 
 				processNoise(OdomModelNoise(rot1Var, transVar, rot2Var)){}
 
-void MotionModel::predictOdometryModel(Particle& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure)
+void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure)
 {
     double rot1 = atan2( 
 					odomCurrentMeasure.y-odomPreviousMeasure.y , 
@@ -22,16 +22,16 @@ void MotionModel::predictOdometryModel(Particle& p, Pose2D& odomPreviousMeasure,
     double rot2 = odomCurrentMeasure.theta - rot1 - odomPreviousMeasure.theta;
 
     //Conceptual doubt : to add or subtract
-    std::default_random_engine generator2;
-    double rot1Bar = rot1 - processNoise.dists[0](generator2);
-    double transBar = trans - processNoise.dists[0](generator2);
-    double rot2Bar = rot2 - processNoise.dists[0](generator2);
+    std::default_random_engine generator(SEED);
+    double rot1Bar = rot1 - processNoise.dists[0](generator);
+    double transBar = trans - processNoise.dists[0](generator);
+    double rot2Bar = rot2 - processNoise.dists[0](generator);
 
 	/* SPDLOG_DEBUG("The ut0 pose is {} {} {}", odomPreviousMeasure.x, odomPreviousMeasure.y, odomPreviousMeasure.theta); */
 	/* SPDLOG_DEBUG("The ut1 pose is {} {} {}", odomCurrentMeasure.x, odomCurrentMeasure.y, odomCurrentMeasure.theta); */
 	/* SPDLOG_DEBUG("The deltas are {} {} {}", rot1Bar, transBar, rot2Bar); */
 
-    p.pose.x = p.pose.x + transBar * cos( rot1Bar + p.pose.theta);
-    p.pose.y = p.pose.y + transBar * sin( rot1Bar + p.pose.theta);
-    p.pose.theta += rot1Bar + rot2Bar;
+    particlePose.x = particlePose.x + transBar * cos( rot1Bar + particlePose.theta);
+    particlePose.y = particlePose.y + transBar * sin( rot1Bar + particlePose.theta);
+    particlePose.theta += rot1Bar + rot2Bar;
 }

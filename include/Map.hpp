@@ -7,7 +7,9 @@
 #include <memory>
 #include <utility>
 #include <ParticleFilter.hpp>
-struct Particle;
+
+// forward declaration to subvert circular include issue
+struct Pose2D;
 
 class Map
 {
@@ -40,6 +42,6 @@ class Map
 
 
 std::shared_ptr<Map> makeMap(const std::string &fName);
-void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Particle> &particleVector = {});
+void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &particleVector = {});
 
 #endif

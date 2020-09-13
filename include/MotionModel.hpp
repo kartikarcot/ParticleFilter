@@ -31,7 +31,7 @@ class MotionModel
     OdomModelNoise processNoise;
     public:
     MotionModel(double _rot1Var,double _transVar,double _rot2Var);
-    void predictOdometryModel(Particle& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure);
+    void predictOdometryModel(Pose2D& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure);
 
 };
 

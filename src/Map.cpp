@@ -13,36 +13,37 @@
 #include "spdlog/spdlog.h"
 
 // @TODO: 
-Map::Map(const std::string &fName, 
-				const std::vector<std::vector<float>> &mapData,
-				const int &xSize,
-				const int &ySize,
-				const int &res,
-				const int &autoX,
-				const int &autoY) : 
-			fileName(fName),
-			data(mapData),
-			mapSizeX(xSize),
-			mapSizeY(ySize),
-			resolution(res),
-			autoshiftedX(autoX),
-			autoshiftedY(autoY)
-			{
-				SPDLOG_INFO("The size of the data vector is {} {}", mapData.size(), mapData[0].size());
-				minX=0;
-				minY=0;
-				maxX=xSize;
-				maxY=ySize;
-			}
+Map::Map(
+		const std::string &fName, 
+		const std::vector<std::vector<float>> &mapData,
+		const int &xSize,
+		const int &ySize,
+		const int &res,
+		const int &autoX,
+		const int &autoY) : 
+		fileName(fName),
+		data(mapData),
+		mapSizeX(xSize),
+		mapSizeY(ySize),
+		resolution(res),
+		autoshiftedX(autoX),
+		autoshiftedY(autoY)
+	{
+		SPDLOG_INFO("The size of the data vector is {} {}", mapData.size(), mapData[0].size());
+		minX=0;
+		minY=0;
+		maxX=xSize;
+		maxY=ySize;
+	}
 
 inline bool keepGoing(std::fstream &fsm, std::string &line)
 {
-	return (std::getline(fsm, line) && (line.compare(0,13,"global_map[0]") != 0));
+return (std::getline(fsm, line) && (line.compare(0,13,"global_map[0]") != 0));
 }
 
 std::shared_ptr<Map> makeMap(const std::string &fName)
 {
-	std::fstream fsm(fName);
+std::fstream fsm(fName);
 	int mapsize_x;
 	int mapsize_y;
 	int resolution;
@@ -145,7 +146,7 @@ std::shared_ptr<Map> makeMap(const std::string &fName)
 			autoshifted_y);
 }
 
-void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Particle> &particleVector)
+void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &particleVector)
 {
 	cv::Mat mat;
 	mat.create(map->data.size(), map->data[0].size(), CV_64FC3);
@@ -159,9 +160,9 @@ void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Particle> &p
 		}
 	}
 
-	for (const auto &particle : particleVector)
+	for (const auto &particlePose : particleVector)
 	{
-		cv::circle(mat, cv::Point2d(particle.pose.x, particle.pose.y), 1, cv::Scalar(0,0,255), -1); 
+		cv::circle(mat, cv::Point2d(particlePose.x, particlePose.y), 1, cv::Scalar(0,0,255), -1); 
 	}
 
 	cv::namedWindow("Map Preview", cv::WINDOW_AUTOSIZE);

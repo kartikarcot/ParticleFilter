@@ -6,7 +6,11 @@
 #include <random>
 #include <memory>
 #include <Map.hpp>
+
+#define SEED 0
 //std::default_random_engine generator;//@TODO: Fix the redefinition error on using single gen, should not need two generators in two classes
+
+// forward declaration to subvert circular include issue
 class Map;
 
 struct Pose2D
@@ -16,11 +20,6 @@ struct Pose2D
 	Pose2D() : x(-1.0), y(-1.0), theta(-1.0) {}
 };
 
-struct Particle
-{
-    Pose2D pose;
-    double weight;
-};
 
 class ParticleFilter
 {
@@ -29,7 +28,7 @@ public:
     std::default_random_engine generator;
     const size_t numParticles;
 
-    std::vector<Particle> particles;
+    std::vector<Pose2D> particles;
 
     std::vector<double> weights;
 

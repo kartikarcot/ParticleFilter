@@ -10,8 +10,8 @@ class SensorModel
 		SensorModel() {};
 		double stepSize = 1;
 		double threshold = 0.5;
-		void beamRangeFinderModel(Particle& p, std::vector<int>& z_t1);
-		void normalizeDistribution(Particle& p);
+		void beamRangeFinderModel(Pose2D& p, std::vector<int>& z_t1);
+		void normalizeDistribution(Pose2D& p);
 		std::vector<int> rayCasting(
 							const Pose2D &laserPoseInOdomFrame, 
 							const Pose2D &robotPoseInOdomFrame,
