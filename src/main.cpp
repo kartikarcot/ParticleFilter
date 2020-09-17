@@ -6,6 +6,7 @@
 #include <MotionModel.hpp>
 #include <SensorModel.hpp>
 #include <boost/optional.hpp>
+#include "Profiler.hpp"
 
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
@@ -16,6 +17,9 @@ int main(int argc, char **argv)
 {
 	spdlog::set_level(
         static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
+
+	spdlog::set_pattern("%^[%l] [%s]%$ %v");
+
 	if (argc!=3)
 	{
 		SPDLOG_ERROR("Invalid number of arguments\n.  \
@@ -25,7 +29,6 @@ int main(int argc, char **argv)
 
 	// initialize map, particle filter and sensor modes
 	std::shared_ptr<Map> worldMap = makeMap(std::string(argv[1]));
-
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
@@ -58,13 +61,12 @@ int main(int argc, char **argv)
 		for (auto &particlePose : particleFilter.particles)
 		{
 			// Motion Model update
-			SPDLOG_DEBUG("The particle before update {} {} {}", particlePose.x, particlePose.y, particlePose.theta);
 			motionModel.predictOdometryModel(particlePose, odomPreviousMeasure, odomCurrentMeasure);
-			SPDLOG_DEBUG("The particle after update {} {} {}", particlePose.x, particlePose.y, particlePose.theta);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{
+				Profiler<std::chrono::milliseconds> pf("Time (milliseconds) taken to perform raycasting");
 				sensorModel.rayCasting(
 						log->laserPose,
 						odomCurrentMeasure,
@@ -75,7 +77,9 @@ int main(int argc, char **argv)
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
 		particleFilter.resample();
-		visualizeMap(worldMap, particleFilter.particles);
+		#ifdef DEBUG
+			visualizeMap(worldMap, particleFilter.particles, "Particles Visualisation");
+		#endif
 	}
 	return 0;
 }

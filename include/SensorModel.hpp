@@ -8,7 +8,7 @@ class SensorModel
 {
 	public:
 		SensorModel() {};
-		double stepSize = 1;
+		double stepSize = 0.5;
 		double threshold = 0.5;
 		void beamRangeFinderModel(Pose2D& p, std::vector<int>& z_t1);
 		void normalizeDistribution(Pose2D& p);

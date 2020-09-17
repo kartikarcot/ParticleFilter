@@ -42,6 +42,9 @@ class Map
 
 
 std::shared_ptr<Map> makeMap(const std::string &fName);
-void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &particleVector = {});
+void visualizeMap(
+		const std::shared_ptr<Map> map, 
+		const std::vector<Pose2D> &particleVector = {},
+		const std::string &message = "Map Visualisation");
 
 #endif

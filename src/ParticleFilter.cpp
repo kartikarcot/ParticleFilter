@@ -6,11 +6,13 @@
 #endif
 #include "spdlog/spdlog.h"
 
+#define PI 3.14159
+
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
     int xCell =int(x), yCell =int(y);
-    return (mp->data[yCell][xCell] < 0.5 && mp->data[yCell][xCell]> 0.0); 
+    return (mp->data[yCell][xCell] >= 0.0 && mp->data[yCell][xCell] <= 0.5); 
 }
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
@@ -18,7 +20,7 @@ ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> 
 				weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
 {
     
-    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-180.0,180.0);
+    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX-1), distY(mp->minY,mp->maxY-1), distTheta(-PI, PI);
     
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);

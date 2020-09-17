@@ -107,6 +107,7 @@ std::fstream fsm(fName);
 	// allocate a 2D array of size (mapsize_x,mapsize_y)
 	std::vector<std::vector<float>> mapData(mapsize_x,std::vector<float>(mapsize_y,0));
 	// we expect mapsize_x number of rows and mapsize_y number of columns in the input
+	float val;
 	try
 	{
 		int count = 0;
@@ -119,8 +120,16 @@ std::fstream fsm(fName);
 
 				ss.clear();
 				ss<<word;
-				if (!(ss>>mapData[i][j]))
+
+				if (!(ss>>val))
 					throw "The file had non-float data";
+				else
+				{
+					if (val < 0)
+						mapData[i][j] = -1;
+					else
+						mapData[i][j] = 1-val;
+				}
 
 				if ((count++ % 50000) == 0)
 				{
@@ -146,7 +155,10 @@ std::fstream fsm(fName);
 			autoshifted_y);
 }
 
-void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &particleVector)
+void visualizeMap(
+		const std::shared_ptr<Map> map, 
+		const std::vector<Pose2D> &particleVector,
+		const std::string &message)
 {
 	cv::Mat mat;
 	mat.create(map->data.size(), map->data[0].size(), CV_64FC3);
@@ -156,6 +168,8 @@ void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &par
 		for (int j = 0; j < map->data[i].size(); j++)
 		{
 			double grayCode = map->data[i][j];
+			// color don't know cells as occupied
+			if (grayCode == -1) grayCode = 1.0;
 			mat.at<cv::Vec3d>(i,j) = cv::Vec3d(grayCode, grayCode, grayCode);
 		}
 	}
@@ -165,9 +179,15 @@ void visualizeMap(const std::shared_ptr<Map> map, const std::vector<Pose2D> &par
 		cv::circle(mat, cv::Point2d(particlePose.x, particlePose.y), 1, cv::Scalar(0,0,255), -1); 
 	}
 
-	cv::namedWindow("Map Preview", cv::WINDOW_AUTOSIZE);
-	cv::imshow("Map Preview", mat);
-	cv::waitKey(1);
+	cv::circle(mat, 
+			cv::Point2d(
+				particleVector[particleVector.size()-1].x, 
+				particleVector[particleVector.size()-1].y), 
+			2,
+			cv::Scalar(0,255,0),
+			-1); 
+
+	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
+	cv::imshow(message, mat);
+	cv::waitKey(500);
 }
-// Usage
-// std::shared_ptr<Map> mp = makeMap("../data/map/wean.dat");
