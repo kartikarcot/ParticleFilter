@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 	while((log = logReader.getLog()))
 	{
 		SPDLOG_DEBUG("The log read was {} {} {}", log->robotPose.x, log->robotPose.y, log->robotPose.theta);
-
+		Profiler<std::chrono::milliseconds> pf("Time (ms) taken to perform one iteration of Particle Filter");
 		// if it is the first log, then copy into odomPrevious and continue
 		if (firstTime)
 		{
@@ -66,7 +66,6 @@ int main(int argc, char **argv)
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{
-				Profiler<std::chrono::milliseconds> pf("Time (milliseconds) taken to perform raycasting");
 				sensorModel.rayCasting(
 						log->laserPose,
 						odomCurrentMeasure,
@@ -74,6 +73,7 @@ int main(int argc, char **argv)
 						worldMap);
 			}
 		}
+
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
 		particleFilter.resample();
