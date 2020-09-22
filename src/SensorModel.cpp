@@ -61,7 +61,7 @@ std::vector<int> SensorModel::rayCasting(
 	}
 	rayPoints.push_back(laserPoseInWorldFrame);
 	#ifdef DEBUG
-		visualizeMap(worldMap, rayPoints, "Raycast visualization");
+		// visualizeMap(worldMap, rayPoints, "Raycast visualization");
 	#endif
 	return simulatedRayCast;
 }
@@ -84,14 +84,13 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 	{
 		size_t realMeas = realLaserData[i], simMeas = simulatedLaserData[i];
 		
-		
-		 logProb += log (zHit * pHit(realMeas,simMeas) 
+		logProb += log (zHit * pHit(realMeas,simMeas) 
 								+ zShort * pShort(realMeas,simMeas) 
 								+ zMax * pMax(realMeas,simMeas) 
 								+ zRand * pRand(realMeas));
 								
 	}
-	
+	SPDLOG_DEBUG("The logProb value is {}", logProb);
 	return exp(logProb);
 	
 }

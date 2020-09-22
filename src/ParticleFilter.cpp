@@ -15,7 +15,7 @@ void normalize_weights(std::vector<double>& weights)
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
-    return (mp->at(x,y) >= 0.0 && mp->at(x,y) <= 0.5); 
+    return (mp->at(x,y) >= 0.0 && mp->at(x,y) <= 0.1); 
 }
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
@@ -52,10 +52,13 @@ void ParticleFilter::update()
 
 void ParticleFilter::resample()
 {
+	SPDLOG_DEBUG("The weights are");
+	for (const auto &w : weights)
+	{
+		std::cout<<w<<std::endl;
+	}
 	std::default_random_engine generator(SEED);
-    
-    normalize_weights(weights);
-	
+    // normalize_weights(weights);
     std::discrete_distribution<int> distribution(weights.begin(), weights.end());
 	std::vector<Pose2D> newParticles(numParticles);
 	for (auto &newParticle : newParticles)
