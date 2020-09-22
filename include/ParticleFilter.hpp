@@ -6,7 +6,7 @@
 #endif
 #include "spdlog/spdlog.h"
 
-
+#include<config.hpp>
 #include <iostream>
 #include <vector>
 #include <random>
