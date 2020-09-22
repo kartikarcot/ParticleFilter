@@ -6,7 +6,7 @@
 
 void normalize_weights(std::vector<double>& weights)
 {
-    double sum =0 ;
+    double sum = 0 ;
     for(auto &weight:weights)
         sum+=weight;
     for(auto &weight:weights)
@@ -30,7 +30,6 @@ ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> 
     while(numGenerated < numParticles)
     {
         double x = distX(generator), y = distY(generator), theta = distTheta(generator);
-        
         if(isFreespace(x,y,mp))
         {
             particles.emplace_back(Pose2D(x,y,theta));
@@ -52,12 +51,14 @@ void ParticleFilter::update()
 
 void ParticleFilter::resample()
 {
-	normalize_weights(weights);
-	/* SPDLOG_DEBUG("The weights are"); */
-	/* for (const auto &w : weights) */
-	/* { */
-		/* std::cout<<w<<std::endl; */
-	/* } */
+	SPDLOG_DEBUG("The weights after normalizing are");
+	for (const auto &w : weights)
+	{
+		std::cout<<w<<" ";
+	}
+	std::cout<<std::endl;
+
+	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
 	std::default_random_engine generator(SEED);
     // normalize_weights(weights);
     std::discrete_distribution<int> distribution(weights.begin(), weights.end());
@@ -65,6 +66,9 @@ void ParticleFilter::resample()
 	for (auto &newParticle : newParticles)
 	{
 		newParticle = particles[distribution(generator)];
+		newParticle.x += x_noise(generator);
+		newParticle.y += y_noise(generator);
+		newParticle.theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
 	return;
