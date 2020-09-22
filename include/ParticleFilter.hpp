@@ -1,6 +1,12 @@
 #ifndef PARTICLEFILTER_H
 #define PARTICLEFILTER_H
 
+#ifdef DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include "spdlog/spdlog.h"
+
+
 #include <iostream>
 #include <vector>
 #include <random>

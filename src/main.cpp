@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	ParticleFilter particleFilter = ParticleFilter(numParticles , worldMap);
 
 	MotionModel motionModel(0.05, 0.05, 0.05);
-	SensorModel sensorModel;
+	SensorModel sensorModel(0.165,0.008,0.003,0.3);
 
 	// declare some useful variables used in MCL
 	bool firstTime = true;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	// read logs and perform probabilistic updates
 	while((log = logReader.getLog()))
 	{
-		SPDLOG_DEBUG("The log read was {} {} {}", log->robotPose.x, log->robotPose.y, log->robotPose.theta);
+		SPDLOG_DEBUG("The log read was {} {} {}, LogType {}", log->robotPose.x, log->robotPose.y, log->robotPose.theta, log->logType);
 		Profiler<std::chrono::milliseconds> pf("Time (ms) taken to perform one iteration of Particle Filter");
 		// if it is the first log, then copy into odomPrevious and continue
 		if (firstTime)
@@ -58,19 +58,22 @@ int main(int argc, char **argv)
 
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
-		for (auto &particlePose : particleFilter.particles)
+
+		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{
+			auto particlePose = particleFilter.particles[i];
 			// Motion Model update
 			motionModel.predictOdometryModel(particlePose, odomPreviousMeasure, odomCurrentMeasure);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{
-				sensorModel.rayCasting(
-						log->laserPose,
-						odomCurrentMeasure,
-						particlePose,
-						worldMap);
+				particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
+											log->laserPose,
+											odomCurrentMeasure,
+											particlePose,
+											log->laserdata,
+											worldMap);
 			}
 		}
 

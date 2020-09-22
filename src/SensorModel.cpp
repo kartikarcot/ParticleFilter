@@ -3,13 +3,6 @@
 #include "Profiler.hpp"
 #include "Map.hpp"
 
-#ifdef DEBUG
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
-#endif
-#include "spdlog/spdlog.h"
-
-#define PI 3.14159
-#define TO_RADIANS(x) (PI*x/180.0)
 
 
 inline bool keepCasting(
@@ -18,17 +11,19 @@ inline bool keepCasting(
 		const double &threshold,
 		const std::shared_ptr<Map> &worldMap)
 {
-	if ((x >= 0) &&
+	return ((x >= 0) &&
 		(x < worldMap->maxX) && 
 		(y >= 0) && 
 		(y < worldMap->maxY) &&
 		(worldMap->data[y][x] >= 0) &&
-		(worldMap->data[y][x] < threshold))
-	{
-		return true;
-	}
-	return false;
+		(worldMap->data[y][x] < threshold));
 }
+
+
+SensorModel::SensorModel(double _zHit, double _zShort, double _zMax, double _zRand)
+: zHit(_zHit), zShort(_zShort), zMax(_zMax), zRand(_zRand)
+{}
+
 
 std::vector<int> SensorModel::rayCasting(
 					const Pose2D &laserPoseInOdomFrame,
@@ -63,16 +58,76 @@ std::vector<int> SensorModel::rayCasting(
 		int count = 0;
 		while (keepCasting(std::round(xNew), std::round(yNew), 1, worldMap))
 		{
-			xNew = laserPoseInWorldFrame.x + count*stepSize*cos(slopeAngle);
-			yNew = laserPoseInWorldFrame.y + count*stepSize*sin(slopeAngle);
+			xNew = laserPoseInWorldFrame.x + count*rayCastingstepSize*cos(slopeAngle);
+			yNew = laserPoseInWorldFrame.y + count*rayCastingstepSize*sin(slopeAngle);
 			rayPoints.push_back(Pose2D(xNew, yNew, 0));
 			count++;
 		}
-		simulatedRayCast[sweepAngle-1] = (int)std::min(2000.0,std::round(stepSize*(count-1)));
+		simulatedRayCast[sweepAngle-1] = (int)std::min(laserMaxRange,std::round(rayCastingstepSize*(count-1)));
 	}
 	rayPoints.push_back(laserPoseInWorldFrame);
 	#ifdef DEBUG
-		visualizeMap(worldMap, rayPoints, "Raycast visualisation");
+		visualizeMap(worldMap, rayPoints, "Raycast visualization");
 	#endif
 	return simulatedRayCast;
+}
+
+
+double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
+							const Pose2D &robotPoseInOdomFrame,
+							Pose2D& particlePoseInWorldFrame, 
+							std::vector<int>& realLaserData,
+							const std::shared_ptr<Map> &worldMap)
+{
+	std::vector<int> simulatedLaserData = rayCasting(laserPoseInOdomFrame,
+											robotPoseInOdomFrame,
+											particlePoseInWorldFrame,
+											worldMap);
+	
+	
+	double logProb = 0;
+	for (size_t i=0 ; i< realLaserData.size() ; i++)
+	{
+		size_t realMeas = realLaserData[i], simMeas = simulatedLaserData[i];
+		
+		
+		 logProb += log (zHit * pHit(realMeas,simMeas) 
+								+ zShort * pShort(realMeas,simMeas) 
+								+ zMax * pMax(realMeas,simMeas) 
+								+ zRand * pRand(realMeas));
+								
+	}
+	
+	return exp(logProb);
+	
+}
+
+
+
+
+inline double SensorModel::pHit(size_t &z, size_t &zStar)
+{
+	
+	double normalizer =  2.0 / (erf( SQRT1_2 * (laserMaxRange-zStar)/zHitVar ) - 
+								erf( SQRT1_2 * (laserMinRange-zStar)/zHitVar) );
+	
+	return z >= laserMinRange && z < zMax ? normalizer * 1/(zHitVar*SQRT_2PI) * 
+											exp( 1/2 * pow(- (z - zStar)/zHitVar , 2)) : 0;	
+}
+
+inline double SensorModel::pShort(size_t &z, size_t &zStar)
+{
+	double normalizer = 1/(1-exp(-1 * zLambdaShort * zStar));
+	return z >= laserMinRange && z < zStar ? normalizer * zLambdaShort * exp(-1 * zLambdaShort * z)  : 0;
+		
+}
+
+inline double SensorModel::pMax(size_t &z, size_t &zStar)
+{
+	return z >= zMax ? 1 : 0 ; //Doubt : greater than equal o or just equal to
+}
+
+inline double SensorModel::pRand(size_t &z)
+{
+	return z >= laserMinRange && z < zMax ? 1/zMax : 0 ;
 }

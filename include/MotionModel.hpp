@@ -1,9 +1,16 @@
 #ifndef MOTIONMODEL_H
 #define MOTIONMODEL_H
 
+#ifdef DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include "spdlog/spdlog.h"
+
+
 #include<ParticleFilter.hpp>
 #include <cmath>
 
+#define MINCHANGE 1e-8
 struct OdomModelNoise
 {
     

@@ -1,25 +1,24 @@
 #include <MotionModel.hpp>
 
-#ifdef DEBUG
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
-#endif
-#include "spdlog/spdlog.h"
 
 MotionModel::MotionModel(double rot1Var, double transVar, double rot2Var) : 
 				processNoise(OdomModelNoise(rot1Var, transVar, rot2Var)){}
 
-void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure)
+void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent)
 {
-    double rot1 = atan2( 
-					odomCurrentMeasure.y-odomPreviousMeasure.y , 
-					odomCurrentMeasure.x-odomPreviousMeasure.x ) 
-				- odomPreviousMeasure.theta;
+
+    double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
+            deltaX = robotPoseinOdomFrameCurrent.x-robotPoseinOdomFramePrev.x;
+
+    double rot1 = deltaY > MINCHANGE ? atan2( deltaY,
+					  deltaX) 
+				- robotPoseinOdomFramePrev.theta : 0;
 
     double trans = sqrt(
-					pow((odomCurrentMeasure.y-odomPreviousMeasure.y),2.0) + 
-					pow((odomCurrentMeasure.x-odomPreviousMeasure.x),2.0));
+					pow(deltaY,2.0) + 
+					pow(deltaX,2.0));
 
-    double rot2 = odomCurrentMeasure.theta - rot1 - odomPreviousMeasure.theta;
+    double rot2 = robotPoseinOdomFrameCurrent.theta - rot1 - robotPoseinOdomFramePrev.theta;
 
     //Conceptual doubt : to add or subtract
     std::default_random_engine generator(SEED);

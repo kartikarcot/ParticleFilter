@@ -1,13 +1,17 @@
 #include<ParticleFilter.hpp>
 #include <random>
 
-#ifdef DEBUG
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
-#endif
-#include "spdlog/spdlog.h"
 
 #define PI 3.14159
 
+void normalize_weights(std::vector<double>& weights)
+{
+    double sum =0 ;
+    for(auto &weight:weights)
+        sum+=weight;
+    for(auto &weight:weights)
+        weight/=sum;
+}
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
@@ -50,7 +54,10 @@ void ParticleFilter::update()
 void ParticleFilter::resample()
 {
 	std::default_random_engine generator(SEED);
-	std::discrete_distribution<int> distribution(weights.begin(), weights.end());
+    
+    normalize_weights(weights);
+	
+    std::discrete_distribution<int> distribution(weights.begin(), weights.end());
 	std::vector<Pose2D> newParticles(numParticles);
 	for (auto &newParticle : newParticles)
 	{
