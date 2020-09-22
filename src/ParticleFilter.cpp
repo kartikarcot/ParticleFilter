@@ -69,3 +69,12 @@ void ParticleFilter::resample()
 	particles = std::move(newParticles);
 	return;
 }
+/**
+ * @brief 
+ *  zMax range - 0.001-0.01
+ *  zHit - 1
+ *  zShort - 0.01-0.1
+ * rand - 100-10000
+ * zHitVvar - start with 1; 8000 
+ * zlambda - 1 
+ */
