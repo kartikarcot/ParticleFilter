@@ -21,7 +21,7 @@ class Map
 		int mapSizeY;
 
 		int minX, minY, maxX, maxY;
-		
+
 		int resolution;
 
 		int autoshiftedX;
@@ -38,6 +38,8 @@ class Map
 				const int &autoY);
 		// copy and move constructors are default, don't see any reason to define them.
 		// destructor is default, all data is stl and will be safely deleted
+		float at(float x, float y);
+		bool valid(float x, float y);
 };
 
 

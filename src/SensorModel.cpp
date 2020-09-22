@@ -6,19 +6,13 @@
 
 
 inline bool keepCasting(
-		const int &x,
-		const int &y,
+		const double &x,
+		const double &y,
 		const double &threshold,
 		const std::shared_ptr<Map> &worldMap)
 {
-	return ((x >= 0) &&
-		(x < worldMap->maxX) && 
-		(y >= 0) && 
-		(y < worldMap->maxY) &&
-		(worldMap->data[y][x] >= 0) &&
-		(worldMap->data[y][x] < threshold));
+	return (worldMap->valid(x,y) && worldMap->at(x,y) >= 0 && worldMap->at(x,y) < threshold);
 }
-
 
 SensorModel::SensorModel(double _zHit, double _zShort, double _zMax, double _zRand)
 : zHit(_zHit), zShort(_zShort), zMax(_zMax), zRand(_zRand)
@@ -56,7 +50,7 @@ std::vector<int> SensorModel::rayCasting(
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;
-		while (keepCasting(std::round(xNew), std::round(yNew), 1, worldMap))
+		while (keepCasting(xNew, yNew, threshold, worldMap))
 		{
 			xNew = laserPoseInWorldFrame.x + count*rayCastingstepSize*cos(slopeAngle);
 			yNew = laserPoseInWorldFrame.y + count*rayCastingstepSize*sin(slopeAngle);

@@ -37,7 +37,7 @@ class SensorModel
 							const Pose2D &particlePoseInWorldFrame, 
 							const std::shared_ptr<Map> &map);
 
-		double rayCastingstepSize = 0.5;
+		double rayCastingstepSize = 5;
 		double threshold = 0.5;
 		double laserMaxRange = 2000; 
 		double laserMinRange = 0.0;

@@ -36,6 +36,24 @@ Map::Map(
 		maxY=ySize;
 	}
 
+float Map::at(float x, float y)
+{
+	int indexX = std::round(x/resolution);
+	int indexY = std::round(y/resolution);
+
+	return data[indexY][indexX];
+}
+
+bool Map::valid(float x, float y)
+{
+	int indexX = std::round(x/resolution);
+	int indexY = std::round(y/resolution);
+	return ((indexX >= 0) &&
+		(indexX < data[0].size()) && 
+		(indexY >= 0) && 
+		(indexY < data.size()));
+}
+
 inline bool keepGoing(std::fstream &fsm, std::string &line)
 {
 return (std::getline(fsm, line) && (line.compare(0,13,"global_map[0]") != 0));
@@ -92,10 +110,10 @@ std::fstream fsm(fName);
 			std::string temp;
 			ss.clear();
 			ss<<line;
-			ss>>temp>>mapsize_x>>mapsize_y;
+			ss>>temp>>mapsize_y>>mapsize_x;
 			if (ss.fail())
 				throw "Invalid Map size provided";
-			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_x, mapsize_y);
+			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_y, mapsize_x);
 		}
 	}
 	catch (const char *msg)
@@ -104,16 +122,16 @@ std::fstream fsm(fName);
 		exit(1);
 	}
 
-	// allocate a 2D array of size (mapsize_x,mapsize_y)
-	std::vector<std::vector<float>> mapData(mapsize_x,std::vector<float>(mapsize_y,0));
+	// allocate a 2D array of size (mapsize_y,mapsize_x)
+	std::vector<std::vector<float>> mapData(mapsize_y,std::vector<float>(mapsize_x,0));
 	// we expect mapsize_x number of rows and mapsize_y number of columns in the input
 	float val;
 	try
 	{
 		int count = 0;
-		for (int i = 0; i < mapsize_x; i++)
+		for (int i = 0; i < mapsize_y; i++)
 		{
-			for (int j = 0; j < mapsize_y; j++)
+			for (int j = 0; j < mapsize_x; j++)
 			{
 				if (!(fsm>>word))
 					throw "File did not have the required number of values!";
@@ -148,8 +166,8 @@ std::fstream fsm(fName);
 	return std::make_shared<Map>(
 			fName, 
 			mapData,
-			mapsize_x,
-			mapsize_y,
+			mapsize_x*resolution,
+			mapsize_y*resolution,
 			resolution,
 			autoshifted_x,
 			autoshifted_y);
@@ -176,13 +194,15 @@ void visualizeMap(
 
 	for (const auto &particlePose : particleVector)
 	{
-		cv::circle(mat, cv::Point2d(particlePose.x, particlePose.y), 1, cv::Scalar(0,0,255), -1); 
+		cv::circle(mat, 
+				cv::Point2d(particlePose.x/map->resolution, particlePose.y/map->resolution), 
+				1, cv::Scalar(0,0,255), -1); 
 	}
 
 	cv::circle(mat, 
 			cv::Point2d(
-				particleVector[particleVector.size()-1].x, 
-				particleVector[particleVector.size()-1].y), 
+				particleVector[particleVector.size()-1].x/map->resolution, 
+				particleVector[particleVector.size()-1].y/map->resolution), 
 			2,
 			cv::Scalar(0,255,0),
 			-1); 

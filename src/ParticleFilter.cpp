@@ -15,8 +15,7 @@ void normalize_weights(std::vector<double>& weights)
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
-    int xCell =int(x), yCell =int(y);
-    return (mp->data[yCell][xCell] >= 0.0 && mp->data[yCell][xCell] <= 0.5); 
+    return (mp->at(x,y) >= 0.0 && mp->at(x,y) <= 0.5); 
 }
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
