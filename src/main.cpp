@@ -7,6 +7,7 @@
 #include <SensorModel.hpp>
 #include <boost/optional.hpp>
 #include "Profiler.hpp"
+#include "config.hpp"
 
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
@@ -32,11 +33,16 @@ int main(int argc, char **argv)
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
-	const size_t numParticles = 10;
-	ParticleFilter particleFilter = ParticleFilter(numParticles , worldMap);
+	ParticleFilter particleFilter = ParticleFilter(NUM_PARTICLES , worldMap);
 
-	MotionModel motionModel(0.05, 0.05, 0.05);
-	SensorModel sensorModel(0.165,0.008,2000,0.3, 1.0, 0.0009);
+	MotionModel motionModel(ROT_VAR, TRANS_VAR);
+	SensorModel sensorModel(
+			Z_HIT,
+			Z_SHORT,
+			Z_MAX,
+			Z_RAND,
+			Z_HIT_VAR,
+			Z_LAMBDA_SHORT);
 
 	// declare some useful variables used in MCL
 	bool firstTime = true;
@@ -64,7 +70,7 @@ int main(int argc, char **argv)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure);
+			// motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)

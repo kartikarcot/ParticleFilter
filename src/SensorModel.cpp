@@ -34,7 +34,7 @@ std::vector<int> SensorModel::rayCasting(
 			particlePoseInWorldFrame.theta + deltaTheta);
 
 	// perform ray casting from the laserPoseInWorldFrame
-	std::vector<int> simulatedRayCast(180,INT_MAX);
+	std::vector<int> simulatedRayCast(180/RAY_SKIP_FACTOR,laserMaxRange);
 	std::vector<Pose2D> rayPoints;
 	// iterate from 0 to 180 degrees
 
@@ -42,8 +42,7 @@ std::vector<int> SensorModel::rayCasting(
 	//		std::round(laserPoseInWorldFrame.x), 
 	//		std::round(laserPoseInWorldFrame.y), 
 	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
-
-	for (int sweepAngle = 1; sweepAngle <=180; sweepAngle++)
+	for (int sweepAngle = 1, index = 0; sweepAngle <=180; sweepAngle+=RAY_SKIP_FACTOR)
 	{
 		double slopeAngle = TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
@@ -56,11 +55,11 @@ std::vector<int> SensorModel::rayCasting(
 			rayPoints.push_back(Pose2D(xNew, yNew, 0));
 			count++;
 		}
-		simulatedRayCast[sweepAngle-1] = (int)std::min(laserMaxRange,std::round(rayCastingstepSize*(count-1)));
+		simulatedRayCast[index++] = (int)std::min(laserMaxRange,std::max(0.0,std::round(rayCastingstepSize*(count-1))));
 	}
 	rayPoints.push_back(laserPoseInWorldFrame);
-	#ifdef DEBUG
-		// visualizeMap(worldMap, rayPoints, "Raycast visualization");
+	#if defined(DEBUG) && VISUALIZE_RAYS
+		visualizeMap(worldMap, rayPoints, "Raycast visualization");
 	#endif
 	return simulatedRayCast;
 }
@@ -77,38 +76,49 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 											particlePoseInWorldFrame,
 											worldMap);
 	
-	
 	double logProb = 0;
-	for (size_t i=0 ; i< realLaserData.size() ; i++)
+	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=RAY_SKIP_FACTOR)
 	{
-		size_t realMeas = realLaserData[i], simMeas = simulatedLaserData[i];
-		
-		logProb += log (zHit * pHit(realMeas,simMeas) 
-								+ zShort * pShort(realMeas,simMeas) 
-								+ zMax * pMax(realMeas,simMeas) 
-								+ zRand * pRand(realMeas));
+		double realMeas = (double)realLaserData[i], simMeas = (double)simulatedLaserData[j++];
+		/* SPDLOG_DEBUG("The realmeas is {}. The simulated meas is {}.", realMeas, simMeas); */
+		logProb += log (131*pHit(realMeas,simMeas)); 
+								/* + zShort * pShort(realMeas,simMeas) */ 
+								/* + zMax * pMax(realMeas,simMeas) */ 
+								/* + zRand * pRand(realMeas)); */
 								
 	}
-	SPDLOG_DEBUG("The logProb value is {}", logProb);
+	/* logProb += 1050; */
+	/* SPDLOG_DEBUG("The logProb value is {}", logProb); */
 	return exp(logProb);
 	
 }
 
+std::vector<double> SensorModel::testingData(double z_star)
+{
+	std::vector<double> z_values(8000);
+	for (int i = 0; i < 8000; i++)
+	{
+		
+		z_values[i] =  zHit * pHit((double)i,z_star)
+								+ zShort * pShort((double)i,z_star)
+								+ zMax * pMax((double)i,z_star)
+								+ zRand * pRand((double)i);
+	}
+	return z_values;
+}
 
-
-
-inline double SensorModel::pHit(size_t &z, size_t &zStar)
+inline double SensorModel::pHit(const double &z, const double &zStar)
 {
 	
 	double normalizer =  2.0 / (erf( SQRT1_2 * (laserMaxRange-zStar)/zHitVar ) - 
 								erf( SQRT1_2 * (laserMinRange-zStar)/zHitVar) );
 	auto val = normalizer * 1/(zHitVar*SQRT_2PI) * 
-											exp( 1/2 * pow(- (z - zStar)/zHitVar , 2));
-	return z >= laserMinRange && z < zMax ? normalizer * 1/(zHitVar*SQRT_2PI) * 
-											exp( 1/2 * pow(- (z - zStar)/zHitVar , 2)) : 0;	
+											exp( -0.5 * pow((z - zStar)/zHitVar , 2));
+	return z >= laserMinRange && z < laserMaxRange ? normalizer * 1/(zHitVar*SQRT_2PI) * 
+											exp( -0.5 * pow((z - zStar)/zHitVar , 2)) : 0;	
 }
 
-inline double SensorModel::pShort(size_t &z, size_t &zStar)
+inline double SensorModel::pShort(const double &z, const double &zStar)
 {
 	double normalizer = 1/(1-exp(-1 * zLambdaShort * zStar));
 	auto val = normalizer * zLambdaShort * exp(-1 * zLambdaShort * z);
@@ -116,12 +126,12 @@ inline double SensorModel::pShort(size_t &z, size_t &zStar)
 		
 }
 
-inline double SensorModel::pMax(size_t &z, size_t &zStar)
+inline double SensorModel::pMax(const double &z, const double &zStar)
 {
-	return z >= zMax ? 1 : 0 ; //Doubt : greater than equal o or just equal to
+	return z >= laserMaxRange ? 1 : 0 ; //Doubt : greater than equal o or just equal to
 }
 
-inline double SensorModel::pRand(size_t &z)
+inline double SensorModel::pRand(const double &z)
 {
-	return z >= laserMinRange && z < zMax ? 1/zMax : 0 ;
+	return z >= laserMinRange && z < laserMaxRange ? 1/laserMaxRange : 0 ;
 }

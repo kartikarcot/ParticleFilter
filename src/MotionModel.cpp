@@ -1,8 +1,8 @@
 #include <MotionModel.hpp>
 
 
-MotionModel::MotionModel(double rot1Var, double transVar, double rot2Var) : 
-				processNoise(OdomModelNoise(rot1Var, transVar, rot2Var)){}
+MotionModel::MotionModel(double rotVar, double transVar) : 
+				processNoise(OdomModelNoise(rotVar, transVar)){}
 
 void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent)
 {
@@ -23,8 +23,8 @@ void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
     //Conceptual doubt : to add or subtract
     std::default_random_engine generator(SEED);
     double rot1Bar = rot1 - processNoise.dists[0](generator);
-    double transBar = trans - processNoise.dists[0](generator);
-    double rot2Bar = rot2 - processNoise.dists[0](generator);
+    double transBar = trans - processNoise.dists[1](generator);
+    double rot2Bar = rot2 - processNoise.dists[2](generator);
 
 	/* SPDLOG_DEBUG("The ut0 pose is {} {} {}", odomPreviousMeasure.x, odomPreviousMeasure.y, odomPreviousMeasure.theta); */
 	/* SPDLOG_DEBUG("The ut1 pose is {} {} {}", odomCurrentMeasure.x, odomCurrentMeasure.y, odomCurrentMeasure.theta); */

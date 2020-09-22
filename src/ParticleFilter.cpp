@@ -1,6 +1,6 @@
 #include<ParticleFilter.hpp>
 #include <random>
-
+#include "config.hpp"
 
 #define PI 3.14159
 
@@ -15,7 +15,7 @@ void normalize_weights(std::vector<double>& weights)
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
-    return (mp->at(x,y) >= 0.0 && mp->at(x,y) <= 0.1); 
+    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD); 
 }
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
@@ -23,7 +23,7 @@ ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> 
 				weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
 {
     
-    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX-1), distY(mp->minY,mp->maxY-1), distTheta(-PI, PI);
+    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
     
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);
@@ -52,11 +52,12 @@ void ParticleFilter::update()
 
 void ParticleFilter::resample()
 {
-	SPDLOG_DEBUG("The weights are");
-	for (const auto &w : weights)
-	{
-		std::cout<<w<<std::endl;
-	}
+	normalize_weights(weights);
+	/* SPDLOG_DEBUG("The weights are"); */
+	/* for (const auto &w : weights) */
+	/* { */
+		/* std::cout<<w<<std::endl; */
+	/* } */
 	std::default_random_engine generator(SEED);
     // normalize_weights(weights);
     std::discrete_distribution<int> distribution(weights.begin(), weights.end());

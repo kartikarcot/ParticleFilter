@@ -3,6 +3,7 @@
 #include <ParticleFilter.hpp>
 #include <Map.hpp>
 #include <memory>
+#include "config.hpp"
 
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
@@ -27,7 +28,7 @@ class SensorModel
 						std::vector<int>& realLaserData,
 						const std::shared_ptr<Map> &worldMap);
 		
-		
+		std::vector<double> testingData(double z_star);
 
 	private:
 
@@ -37,10 +38,10 @@ class SensorModel
 							const Pose2D &particlePoseInWorldFrame, 
 							const std::shared_ptr<Map> &map);
 
-		double rayCastingstepSize = 5;
-		double threshold = 0.5;
-		double laserMaxRange = 2000; 
-		double laserMinRange = 0.0;
+		double rayCastingstepSize = RAY_CASTING_STEP_SIZE;
+		double threshold = THRESHOLD;
+		double laserMaxRange = MAX_RANGE; 
+		double laserMinRange = 0;
 		
 
 		//Sensor model probability parameters
@@ -51,10 +52,10 @@ class SensorModel
 		double zHitVar;
 		double zLambdaShort;
 
-		double pHit(size_t &z, size_t &zStar);
-		double pShort(size_t &z, size_t &zStar);
-		double pMax(size_t &z, size_t &zStar);
-		double pRand(size_t &z);
+		double pHit(const double &z, const double &zStar);
+		double pShort(const double &z, const double &zStar);
+		double pMax(const double &z, const double &zStar);
+		double pRand(const double &z);
 };  
 
 #endif
