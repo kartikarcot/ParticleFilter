@@ -9,12 +9,11 @@ class Resampler
         
         Resampler();
         
-        void normalize(std::vector<Particle>& particles);
+        void normalize(std::vector<double>& weights);
 
-        void low_variance_sampling(std::vector<Particle>& particles);
+        void low_variance_sampling(std::vector<double>& weights);
 
-
-        void multinomial_sampling(std::vector<Particle>& particles);
+        void multinomial_sampling(std::vector<double>& weights);
         
 };
 

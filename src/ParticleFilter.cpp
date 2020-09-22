@@ -1,6 +1,6 @@
 #include<ParticleFilter.hpp>
 #include <random>
-
+#include "config.hpp"
 
 #define PI 3.14159
 
@@ -15,8 +15,7 @@ void normalize_weights(std::vector<double>& weights)
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
-    int xCell =int(x), yCell =int(y);
-    return (mp->data[yCell][xCell] >= 0.0 && mp->data[yCell][xCell] <= 0.1); 
+    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD); 
 }
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
@@ -24,7 +23,7 @@ ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> 
 				weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
 {
     
-    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX-1), distY(mp->minY,mp->maxY-1), distTheta(-PI, PI);
+    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
     
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);

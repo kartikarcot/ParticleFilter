@@ -8,7 +8,12 @@ IF(DEBUG_MODE)
 	add_definitions(-DDEBUG)
 ENDIF(DEBUG_MODE)
 
-add_executable(main main.cpp Map.cpp LogReader.cpp MotionModel.cpp ParticleFilter.cpp SensorModel.cpp)
+add_executable(main main.cpp Map.cpp LogReader.cpp MotionModel.cpp ParticleFilter.cpp SensorModel.cpp Utils.cpp)
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 target_link_libraries(main ${OpenCV_LIBS})
+
+add_executable(testing testing.cpp Map.cpp LogReader.cpp MotionModel.cpp ParticleFilter.cpp SensorModel.cpp)
+target_include_directories(testing PUBLIC ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(testing ${OpenCV_LIBS})
+
 message("${Boost_INCLUDE_DIRS}")
