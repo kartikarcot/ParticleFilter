@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
-	const size_t numParticles = 100;
+	const size_t numParticles = 10;
 	ParticleFilter particleFilter = ParticleFilter(numParticles , worldMap);
 
 	MotionModel motionModel(0.05, 0.05, 0.05);
@@ -46,7 +46,8 @@ int main(int argc, char **argv)
 	// read logs and perform probabilistic updates
 	while((log = logReader.getLog()))
 	{
-		SPDLOG_DEBUG("The log read was {} {} {}, LogType {}", log->robotPose.x, log->robotPose.y, log->robotPose.theta, log->logType);
+		SPDLOG_DEBUG("The log read was {} {} {}, LogType {}", 
+				log->robotPose.x, log->robotPose.y, log->robotPose.theta, log->logType);
 		Profiler<std::chrono::milliseconds> pf("Time (ms) taken to perform one iteration of Particle Filter");
 		// if it is the first log, then copy into odomPrevious and continue
 		if (firstTime)
@@ -61,9 +62,9 @@ int main(int argc, char **argv)
 
 		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{
-			auto particlePose = particleFilter.particles[i];
+			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particlePose, odomPreviousMeasure, odomCurrentMeasure);
+			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
 				particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
 											log->laserPose,
 											odomCurrentMeasure,
-											particlePose,
+											particleFilter.particles[i],
 											log->laserdata,
 											worldMap);
 			}
