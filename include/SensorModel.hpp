@@ -19,7 +19,7 @@ class SensorModel
 
 	public:
 	
-	SensorModel(double zHit, double zShort, double zMax, double zRand);
+	SensorModel(double zHit, double zShort, double zMax, double zRand, double zHitVar, double zLambdaShort);
 		
 	double beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 						const Pose2D &robotPoseInOdomFrame,

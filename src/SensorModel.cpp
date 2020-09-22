@@ -14,10 +14,9 @@ inline bool keepCasting(
 	return (worldMap->valid(x,y) && worldMap->at(x,y) >= 0 && worldMap->at(x,y) < threshold);
 }
 
-SensorModel::SensorModel(double _zHit, double _zShort, double _zMax, double _zRand)
-: zHit(_zHit), zShort(_zShort), zMax(_zMax), zRand(_zRand)
+SensorModel::SensorModel(double _zHit, double _zShort, double _zMax, double _zRand, double _zHitVar, double _zLambdaShort)
+: zHit(_zHit), zShort(_zShort), zMax(_zMax), zRand(_zRand), zHitVar(_zHitVar), zLambdaShort(_zLambdaShort)
 {}
-
 
 std::vector<int> SensorModel::rayCasting(
 					const Pose2D &laserPoseInOdomFrame,
@@ -103,7 +102,8 @@ inline double SensorModel::pHit(size_t &z, size_t &zStar)
 	
 	double normalizer =  2.0 / (erf( SQRT1_2 * (laserMaxRange-zStar)/zHitVar ) - 
 								erf( SQRT1_2 * (laserMinRange-zStar)/zHitVar) );
-	
+	auto val = normalizer * 1/(zHitVar*SQRT_2PI) * 
+											exp( 1/2 * pow(- (z - zStar)/zHitVar , 2));
 	return z >= laserMinRange && z < zMax ? normalizer * 1/(zHitVar*SQRT_2PI) * 
 											exp( 1/2 * pow(- (z - zStar)/zHitVar , 2)) : 0;	
 }
@@ -111,6 +111,7 @@ inline double SensorModel::pHit(size_t &z, size_t &zStar)
 inline double SensorModel::pShort(size_t &z, size_t &zStar)
 {
 	double normalizer = 1/(1-exp(-1 * zLambdaShort * zStar));
+	auto val = normalizer * zLambdaShort * exp(-1 * zLambdaShort * z);
 	return z >= laserMinRange && z < zStar ? normalizer * zLambdaShort * exp(-1 * zLambdaShort * z)  : 0;
 		
 }

@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	ParticleFilter particleFilter = ParticleFilter(numParticles , worldMap);
 
 	MotionModel motionModel(0.05, 0.05, 0.05);
-	SensorModel sensorModel(0.165,0.008,0.003,0.3);
+	SensorModel sensorModel(0.165,0.008,2000,0.3, 1.0, 0.0009);
 
 	// declare some useful variables used in MCL
 	bool firstTime = true;
