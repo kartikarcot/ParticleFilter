@@ -44,14 +44,15 @@ void ParticleFilter::update()
 
 void ParticleFilter::resample()
 {
-	SPDLOG_DEBUG("The weights after normalizing are");
-	for (const auto &w : weights)
-	{
-		std::cout<<w<<" ";
-	}
-	std::cout<<std::endl;
+	/* SPDLOG_DEBUG("The weights after normalizing are"); */
+	/* for (const auto &w : weights) */
+	/* { */
+	/* 	std::cout<<w<<" "; */
+	/* } */
+	/* std::cout<<std::endl; */
 
 	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+	std::random_device rd;
 	std::default_random_engine generator(SEED);
     // normalize_weights(weights);
     std::discrete_distribution<int> distribution(weights.begin(), weights.end());
@@ -64,6 +65,78 @@ void ParticleFilter::resample()
 		newParticle.theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
+	return;
+}
+
+void ParticleFilter::lowVarianceResample()
+{
+	std::vector<double> cumulativeWeights(numParticles);
+	double stepSize = ((double)1/numParticles);
+	std::random_device rd;
+	std::default_random_engine generator(SEED);
+	std::uniform_real_distribution<> distribution(0, stepSize);
+	double startVal = distribution(generator), curVal = 0;
+	std::vector<Pose2D> newParticles(numParticles);
+	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+
+	// normalize the weights
+	normalize_weights(weights);
+	// calculate the cumulativeWeightvector
+	cumulativeWeights[0] = weights[0];
+	for (int i = 1; i < numParticles; i++)
+		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
+
+	// sample values and get indices
+	for (int i = 0; i < numParticles; i++)
+	{
+		curVal = startVal + i * (stepSize);
+		auto upperBoundIter = std::upper_bound(cumulativeWeights.begin(), cumulativeWeights.end(), curVal);
+		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
+		// calculate the new partcle with some noise
+		newParticles[i] = particles[index];
+		newParticles[i].x += x_noise(generator);
+		newParticles[i].y += y_noise(generator);
+		newParticles[i].theta += theta_noise(generator);
+	}
+	particles = std::move(newParticles);
+	return;
+}
+
+void ParticleFilter::lowVarianceResampleTest()
+{
+	std::vector<double> cumulativeWeights(numParticles);
+	double stepSize = ((double)1/numParticles);
+	std::random_device rd;
+	std::default_random_engine generator(rd());
+	std::uniform_real_distribution<> distribution(0, stepSize);
+	double startVal = distribution(generator), curVal = 0;
+	std::vector<Pose2D> newParticles(numParticles);
+	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+
+	// normalize the weights
+	normalize_weights(weights);
+	// calculate the cumulativeWeightvector
+	cumulativeWeights[0] = weights[0];
+	for (int i = 1; i < numParticles; i++)
+		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
+	std::unordered_map<int,int> countMap;
+	// sample values and get indices
+	for (int i = 0; i < numParticles; i++)
+	{
+		curVal = startVal + i * (stepSize);
+		auto upperBoundIter = std::upper_bound(cumulativeWeights.begin(), cumulativeWeights.end(), curVal);
+		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
+		countMap[index]++;
+		// calculate the new partcle with some noise
+		newParticles[i] = particles[index];
+		newParticles[i].x += x_noise(generator);
+		newParticles[i].y += y_noise(generator);
+		newParticles[i].theta += theta_noise(generator);
+	}
+
+	for (const auto &it : countMap)
+		SPDLOG_DEBUG("The index {} was sampled {} times", it.first, it.second);
+
 	return;
 }
 /**

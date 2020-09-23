@@ -23,3 +23,6 @@ function pf() {
 - [ ] Add types.h for standard types used like Map and Pose2D
 - [ ] Tune hyperparameters
 - [ ] Add tests in separate directory
+```
+rm z_vals.txt && touch z_vals.txt && ./src/testing && gnuplot -e "set terminal svg; set style data lines; plot 'z_vals.txt'" > plot.svg
+```

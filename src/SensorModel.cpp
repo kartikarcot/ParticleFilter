@@ -43,13 +43,14 @@ std::vector<int> SensorModel::rayCasting(
 	//		std::round(laserPoseInWorldFrame.x), 
 	//		std::round(laserPoseInWorldFrame.y), 
 	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
-	for (int sweepAngle = 1, index = 0; sweepAngle <=180; sweepAngle+=RAY_SKIP_FACTOR)
+	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=RAY_SKIP_FACTOR)
 	{
-		double slopeAngle = TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
+		double slopeAngle = TO_RADIANS(-PI/2 + sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;
-		while (keepCasting(xNew, yNew, threshold, worldMap))
+		while (count*rayCastingstepSize < laserMaxRange && 
+				keepCasting(xNew, yNew, threshold, worldMap))
 		{
 			xNew = laserPoseInWorldFrame.x + count*rayCastingstepSize*cos(slopeAngle);
 			yNew = laserPoseInWorldFrame.y + count*rayCastingstepSize*sin(slopeAngle);
@@ -81,14 +82,12 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=RAY_SKIP_FACTOR)
 	{
 		double realMeas = (double)realLaserData[i], simMeas = (double)simulatedLaserData[j++];
-		/* SPDLOG_DEBUG("The realmeas is {}. The simulated meas is {}.", realMeas, simMeas); */
-		logProb += log (131*pHit(realMeas,simMeas)); 
-								/* + zShort * pShort(realMeas,simMeas) */ 
-								/* + zMax * pMax(realMeas,simMeas) */ 
-								/* + zRand * pRand(realMeas)); */
+		logProb += log (zHit * pHit(realMeas,simMeas)
+								+ zShort * pShort(realMeas,simMeas) 
+								+ zMax * pMax(realMeas,simMeas) 
+								+ zRand * pRand(realMeas));
 								
 	}
-	/* logProb += 1050; */
 	/* SPDLOG_DEBUG("The logProb value is {}", logProb); */
 	return exp(logProb);
 	

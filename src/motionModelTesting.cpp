@@ -8,7 +8,7 @@
 #include <boost/optional.hpp>
 #include "Profiler.hpp"
 #include "config.hpp"
-#include <Utils.hpp>
+#include <fstream>
 
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
@@ -34,10 +34,9 @@ int main(int argc, char **argv)
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
-	ParticleFilter particleFilter = ParticleFilter(NUM_PARTICLES , worldMap);
-	std::vector<double> alphas = ALPHAS;
-	MotionModel motionModel(ROT1_VAR, TRANS_VAR, ROT2_VAR, alphas);
-	
+	ParticleFilter particleFilter = ParticleFilter(1 , worldMap);
+	particleFilter.particles[0] = Pose2D(4000,4000,0);
+	MotionModel motionModel(ROT_VAR, TRANS_VAR);
 	SensorModel sensorModel(
 			Z_HIT,
 			Z_SHORT,
@@ -51,6 +50,10 @@ int main(int argc, char **argv)
 	Pose2D odomPreviousMeasure, odomCurrentMeasure;
 	Pose2D particlePreviousMeasure, particleCurrentMeasure;
 	
+	// create alog file for storing particle positions
+	/* std::fstream fsm; */
+	/* fsm.open("/Users/stark/Projects/16833_HW1_ParticleFilter/build/particlePose.txt"); */
+	std::vector<Pose2D> particleHistory;
 	// read logs and perform probabilistic updates
 	while((log = logReader.getLog()))
 	{
@@ -68,31 +71,17 @@ int main(int argc, char **argv)
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
 
-		
 		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, false);
-
-			// Sensor Model update
-			if (log->logType == LogType::LASER)
-			{
-				particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
-											log->laserPose,
-											odomCurrentMeasure,
-											particleFilter.particles[i],
-											log->laserdata,
-											worldMap);
-			}
+			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure);
+			particleHistory.push_back(particleFilter.particles[0]);
 		}
-
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
-		particleFilter.lowVarianceResample();
-		#ifdef DEBUG
-			visualizeMap(worldMap, particleFilter.particles, "Particles Visualisation");
-		#endif
 	}
+	/* fsm.close(); */
+	visualizeMap(worldMap, particleHistory, "Particles History", -1);
 	return 0;
 }

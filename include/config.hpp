@@ -2,8 +2,10 @@
 #define CONFIG_H
 
 // Particle Fileter
-#define NUM_PARTICLES 2000
-#define IGNORE_OBSTACLES 1
+#define MOTION_MODEL_DEBUG false
+#define NUM_PARTICLES 5000
+#define POS_VAR 10
+#define THETA_VAR 10
 
 // Motion Model
 #define ROT1_VAR 0.05
@@ -12,13 +14,13 @@
 #define ALPHAS {0.1,0.1,0.1,0.1}
 
 // Sensor Model
-#define Z_MAX 0.001
-#define Z_RAND 10.0
-#define Z_SHORT 0.2
-#define Z_HIT 2
+#define Z_MAX 5
+#define Z_RAND 500
+#define Z_SHORT 5
+#define Z_HIT 100
 
 #define Z_HIT_VAR 50.0
-#define Z_LAMBDA_SHORT 0.001
+#define Z_LAMBDA_SHORT 0.01
 
 #define RAY_CASTING_STEP_SIZE 2
 #define RAY_SKIP_FACTOR 2
@@ -30,6 +32,4 @@
 #define MAX_RANGE 8000
 #define VISUALIZE_RAYS false
 
-#define POS_VAR 5
-#define THETA_VAR 2
 #endif

@@ -16,4 +16,11 @@ add_executable(testing testing.cpp Map.cpp LogReader.cpp MotionModel.cpp Particl
 target_include_directories(testing PUBLIC ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 target_link_libraries(testing ${OpenCV_LIBS})
 
+add_executable(motionModelTesting motionModelTesting.cpp Map.cpp LogReader.cpp MotionModel.cpp ParticleFilter.cpp SensorModel.cpp)
+target_include_directories(motionModelTesting PUBLIC ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(motionModelTesting ${OpenCV_LIBS})
+
+add_executable(lowVarianceResample lowVarianceSamplingTest.cpp Map.cpp LogReader.cpp MotionModel.cpp ParticleFilter.cpp SensorModel.cpp)
+target_include_directories(lowVarianceResample PUBLIC ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(lowVarianceResample ${OpenCV_LIBS})
 message("${Boost_INCLUDE_DIRS}")

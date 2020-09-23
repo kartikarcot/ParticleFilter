@@ -173,7 +173,8 @@ std::fstream fsm(fName);
 void visualizeMap(
 		const std::shared_ptr<Map> map, 
 		const std::vector<Pose2D> &particleVector,
-		const std::string &message)
+		const std::string &message,
+		int timeout)
 {
 	cv::Mat mat;
 	mat.create(map->data.size(), map->data[0].size(), CV_64FC3);
@@ -208,5 +209,5 @@ void visualizeMap(
 
 	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
 	cv::imshow(message, mat);
-	cv::waitKey(500);
+	cv::waitKey(timeout);
 }

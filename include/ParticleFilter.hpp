@@ -52,6 +52,10 @@ public:
     ** Resample particles for the next time step with probabilities proportial to their importance weights.
     */
     void resample();
+
+	// Low variance resampling technique
+	void lowVarianceResample();
+	void lowVarianceResampleTest();
 };
 
 #endif
