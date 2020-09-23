@@ -45,7 +45,7 @@ std::vector<int> SensorModel::rayCasting(
 	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
 	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=RAY_SKIP_FACTOR)
 	{
-		double slopeAngle = TO_RADIANS(-PI/2 + sweepAngle) + laserPoseInWorldFrame.theta;
+		double slopeAngle = -PI/2 + TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;

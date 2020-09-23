@@ -23,7 +23,7 @@
 #define Z_LAMBDA_SHORT 0.01
 
 #define RAY_CASTING_STEP_SIZE 2
-#define RAY_SKIP_FACTOR 2
+#define RAY_SKIP_FACTOR 10
 
 // Map
 #define OBSTACLE_THRESHOLD 0.3

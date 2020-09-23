@@ -38,17 +38,17 @@ float Map::at(float x, float y)
 	int indexX = std::round(x/resolution);
 	int indexY = std::round(y/resolution);
 
-	return data[indexY][indexX];
+	return data[indexX][indexY];
 }
 
 bool Map::valid(float x, float y)
 {
 	int indexX = std::round(x/resolution);
 	int indexY = std::round(y/resolution);
-	return ((indexX >= 0) &&
-		(indexX < data[0].size()) && 
-		(indexY >= 0) && 
-		(indexY < data.size()));
+	return ((indexY >= 0) &&
+		(indexY < data[0].size()) && 
+		(indexX >= 0) && 
+		(indexX < data.size()));
 }
 
 inline bool keepGoing(std::fstream &fsm, std::string &line)
@@ -107,10 +107,10 @@ std::fstream fsm(fName);
 			std::string temp;
 			ss.clear();
 			ss<<line;
-			ss>>temp>>mapsize_y>>mapsize_x;
+			ss>>temp>>mapsize_x>>mapsize_y;
 			if (ss.fail())
 				throw "Invalid Map size provided";
-			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_y, mapsize_x);
+			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_x, mapsize_y);
 		}
 	}
 	catch (const char *msg)
@@ -194,15 +194,15 @@ void visualizeMap(
 	for (const auto &particlePose : particleVector)
 	{
 		cv::circle(mat, 
-				cv::Point2d(particlePose.x/map->resolution, particlePose.y/map->resolution), 
+				cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
 				1, cv::Scalar(0,0,255), -1); 
 	}
 
 	
 	cv::circle(mat, 
 			cv::Point2d(
-				particleVector[particleVector.size()-1].x/map->resolution, 
-				particleVector[particleVector.size()-1].y/map->resolution), 
+				particleVector[particleVector.size()-1].y/map->resolution, 
+				particleVector[particleVector.size()-1].x/map->resolution), 
 			2,
 			cv::Scalar(0,255,0),
 			-1); 
