@@ -21,9 +21,8 @@ void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
     double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
             deltaX = robotPoseinOdomFrameCurrent.x-robotPoseinOdomFramePrev.x;
 
-    double rot1 = deltaY > MINCHANGE ? atan2( deltaY,
-					  deltaX) 
-				- robotPoseinOdomFramePrev.theta : 0;
+    double rot1 = deltaY > MINCHANGE && deltaX > MINCHANGE? 
+                atan2( deltaY,deltaX) - robotPoseinOdomFramePrev.theta : 0;
 
     double trans = sqrt(
 					pow(deltaY,2.0) + 
@@ -37,9 +36,9 @@ void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
     
     processNoise = OdomModelNoise(rot1Var,transVar,rot2Var);
     
-    double rot1Bar = rot1 - processNoise.dists[0](generator);
-    double transBar = trans - processNoise.dists[1](generator);
-    double rot2Bar = rot2 - processNoise.dists[2](generator);
+    double rot1Bar = rot1 ;//- processNoise.dists[0](generator);
+    double transBar = trans ;//- processNoise.dists[1](generator);
+    double rot2Bar = rot2 ;//- processNoise.dists[2](generator);
 
 	/* SPDLOG_DEBUG("The ut0 pose is {} {} {}", odomPreviousMeasure.x, odomPreviousMeasure.y, odomPreviousMeasure.theta); */
 	/* SPDLOG_DEBUG("The ut1 pose is {} {} {}", odomCurrentMeasure.x, odomCurrentMeasure.y, odomCurrentMeasure.theta); */

@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap);
+			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
 			particleHistory.push_back(particleFilter.particles[0]);
 		}
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration

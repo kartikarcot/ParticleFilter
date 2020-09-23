@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 	boost::optional<Log> log;
 
 	ParticleFilter particleFilter = ParticleFilter(1 , worldMap);
-	particleFilter.particles[0] = Pose2D(4000,4000,90);
+	particleFilter.particles[0] = Pose2D(4000,3000,35.0/180.0);
 	std::vector<double> alphas = ALPHAS;
 	MotionModel motionModel(ROT1_VAR, TRANS_VAR, ROT2_VAR, alphas);
 	

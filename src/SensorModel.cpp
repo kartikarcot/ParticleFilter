@@ -120,19 +120,13 @@ std::vector<double> SensorModel::testingData(double z_star)
 inline double SensorModel::pHit(const double &z, const double &zStar)
 {
 	
-	double normalizer =  2.0 / (erf( SQRT1_2 * (laserMaxRange-zStar)/zHitVar ) - 
-								erf( SQRT1_2 * (laserMinRange-zStar)/zHitVar) );
-	auto val = normalizer * 1/(zHitVar*SQRT_2PI) * 
-											exp( -0.5 * pow((z - zStar)/zHitVar , 2));
-	return z >= laserMinRange && z < laserMaxRange ? normalizer * 1/(zHitVar*SQRT_2PI) * 
+	return z >= laserMinRange && z < laserMaxRange ?  1/(zHitVar*SQRT_2PI) * 
 											exp( -0.5 * pow((z - zStar)/zHitVar , 2)) : 0;	
 }
 
 inline double SensorModel::pShort(const double &z, const double &zStar)
 {
-	double normalizer = 1/(1-exp(-1 * zLambdaShort * zStar));
-	auto val = normalizer * zLambdaShort * exp(-1 * zLambdaShort * z);
-	return z >= laserMinRange && z < zStar ? normalizer * zLambdaShort * exp(-1 * zLambdaShort * z)  : 0;
+	return z >= laserMinRange && z < zStar ? zLambdaShort * exp(-1 * zLambdaShort * z)  : 0;
 		
 }
 
