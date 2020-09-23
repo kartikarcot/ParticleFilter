@@ -15,15 +15,15 @@
 
 // Sensor Model
 #define Z_MAX 5
-#define Z_RAND 500
-#define Z_SHORT 5
+#define Z_RAND 1000
+#define Z_SHORT 0.1
 #define Z_HIT 100
 
 #define Z_HIT_VAR 50.0
 #define Z_LAMBDA_SHORT 0.01
 
 #define RAY_CASTING_STEP_SIZE 2
-#define RAY_SKIP_FACTOR 10
+#define RAY_SKIP_FACTOR 1
 
 // Map
 #define OBSTACLE_THRESHOLD 0.3
@@ -31,5 +31,8 @@
 // range should be ints
 #define MAX_RANGE 8000
 #define VISUALIZE_RAYS false
+
+// Visualizong
+#define TIMEOUT 10
 
 #endif

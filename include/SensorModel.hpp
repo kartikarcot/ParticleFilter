@@ -28,15 +28,15 @@ class SensorModel
 						std::vector<int>& realLaserData,
 						const std::shared_ptr<Map> &worldMap);
 		
-		std::vector<double> testingData(double z_star);
+	std::vector<double> testingData(double z_star);
 
-	private:
-
-		std::vector<int> rayCasting(
+	std::vector<int> rayCasting(
 							const Pose2D &laserPoseInOdomFrame, 
 							const Pose2D &robotPoseInOdomFrame,
 							const Pose2D &particlePoseInWorldFrame, 
 							const std::shared_ptr<Map> &map);
+
+	private:
 
 		double rayCastingstepSize = RAY_CASTING_STEP_SIZE;
 		double threshold = OBSTACLE_THRESHOLD;

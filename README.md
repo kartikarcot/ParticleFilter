@@ -25,4 +25,5 @@ function pf() {
 - [ ] Add tests in separate directory
 ```
 rm z_vals.txt && touch z_vals.txt && ./src/testing && gnuplot -e "set terminal svg; set style data lines; plot 'z_vals.txt'" > plot.svg
+ gnuplot -e "set terminal svg; set style data lines; plot 'laser.txt' using 1 with lines title 'simulated', 'laser.txt' using 2 with lines title 'log' " > laser.svg
 ```

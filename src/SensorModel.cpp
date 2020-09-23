@@ -36,7 +36,9 @@ std::vector<int> SensorModel::rayCasting(
 
 	// perform ray casting from the laserPoseInWorldFrame
 	std::vector<int> simulatedRayCast(180/RAY_SKIP_FACTOR,laserMaxRange);
-	std::vector<Pose2D> rayPoints;
+	#if defined(DEBUG) && VISUALIZE_RAYS
+		std::vector<Pose2D> rayPoints;
+	#endif
 	// iterate from 0 to 180 degrees
 
 	// SPDLOG_DEBUG("ORIGIN ({},{}): {}", 
@@ -45,7 +47,7 @@ std::vector<int> SensorModel::rayCasting(
 	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
 	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=RAY_SKIP_FACTOR)
 	{
-		double slopeAngle = -PI/2 + TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
+		double slopeAngle = PI/2 - TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;
@@ -54,14 +56,22 @@ std::vector<int> SensorModel::rayCasting(
 		{
 			xNew = laserPoseInWorldFrame.x + count*rayCastingstepSize*cos(slopeAngle);
 			yNew = laserPoseInWorldFrame.y + count*rayCastingstepSize*sin(slopeAngle);
-			rayPoints.push_back(Pose2D(xNew, yNew, 0));
+
+			#if defined(DEBUG) && VISUALIZE_RAYS
+				rayPoints.push_back(Pose2D(xNew, yNew, 0));
+			#endif
+
 			count++;
 		}
 		simulatedRayCast[index++] = (int)std::min(laserMaxRange,std::max(0.0,std::round(rayCastingstepSize*(count-1))));
+		#if defined(DEBUG) && VISUALIZE_RAYS
+			visualizeMap(worldMap, rayPoints, "Raycast visualization", TIMEOUT);
+		#endif
 	}
-	rayPoints.push_back(laserPoseInWorldFrame);
+
 	#if defined(DEBUG) && VISUALIZE_RAYS
-		visualizeMap(worldMap, rayPoints, "Raycast visualization");
+		rayPoints.push_back(laserPoseInWorldFrame);
+		visualizeMap(worldMap, rayPoints, "Raycast visualization", TIMEOUT);
 	#endif
 	return simulatedRayCast;
 }
