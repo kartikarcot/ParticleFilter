@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <memory>
 #include <Map.hpp>
@@ -13,7 +14,6 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #endif
 #include "spdlog/spdlog.h"
-#define MOTION_MODEL_DEBUG true
 
 int main(int argc, char **argv)
 {
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
-		motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap);
+		motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
 		
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;

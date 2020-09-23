@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap);
+			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, false);
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)

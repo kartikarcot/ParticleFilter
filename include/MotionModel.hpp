@@ -36,7 +36,7 @@ class MotionModel
     OdomModelNoise processNoise;
     public:
     MotionModel(double _rot1Var,double _transVar,double _rot2Var,std::vector<double> alphas);
-    void predictOdometryModel(Pose2D& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure, std::shared_ptr<Map> mp);
+    void predictOdometryModel(Pose2D& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure, std::shared_ptr<Map> mp, bool ignoreObstacles);
 
 };
 

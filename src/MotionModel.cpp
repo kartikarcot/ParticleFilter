@@ -2,9 +2,10 @@
 #include <Utils.hpp>
 
 
+
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
-return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD);
+    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD);
 }
 
 
@@ -14,7 +15,7 @@ MotionModel::MotionModel(double rot1Var, double trans1Var, double rot2Var, std::
 
 
 
-void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent, std::shared_ptr<Map> mp)
+void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent, std::shared_ptr<Map> mp, bool ignoreObstacles)
 {
 
     double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
@@ -46,12 +47,12 @@ void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
 
     auto newX = particlePose.x + transBar * cos( rot1Bar + particlePose.theta);
     auto newY = particlePose.y + transBar * sin( rot1Bar + particlePose.theta);
-    if(isFreespace(newX, newY, mp) && !MOTION_MODEL_DEBUG)
-     {
+    
+    if( ignoreObstacles || isFreespace(newX, newY, mp) )
+    {
         particlePose.x = newX;
         particlePose.y = newY;
         particlePose.theta += rot1Bar + rot2Bar;
-     }   
-
+    }
     
 }

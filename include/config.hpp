@@ -2,14 +2,14 @@
 #define CONFIG_H
 
 // Particle Fileter
-#define MOTION_MODEL_DEBUG false
 #define NUM_PARTICLES 2000
+#define IGNORE_OBSTACLES 1
 
-#define ALPHAS {0.1,0.1,0.1,0.1}
 // Motion Model
 #define ROT1_VAR 0.05
 #define TRANS_VAR 0.05
 #define ROT2_VAR 0.05
+#define ALPHAS {0.1,0.1,0.1,0.1}
 
 // Sensor Model
 #define Z_MAX 0.001
