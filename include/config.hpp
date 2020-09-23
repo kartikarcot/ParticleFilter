@@ -8,7 +8,7 @@
 #define THETA_VAR 10
 
 // Motion Model
-#define ROT1_VAR 0.05
+#define ROT1_VAR 0.005
 #define TRANS_VAR 0.05
 #define ROT2_VAR 0.05
 #define ALPHAS {0.1,0.1,0.1,0.1}
@@ -23,7 +23,7 @@
 #define Z_LAMBDA_SHORT 0.01
 
 #define RAY_CASTING_STEP_SIZE 2
-#define RAY_SKIP_FACTOR 1
+#define RAY_SKIP_FACTOR 10
 
 // Map
 #define OBSTACLE_THRESHOLD 0.3

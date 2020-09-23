@@ -36,7 +36,8 @@ int main(int argc, char **argv)
 
 	ParticleFilter particleFilter = ParticleFilter(1 , worldMap);
 	particleFilter.particles[0] = Pose2D(4000,4000,0);
-	MotionModel motionModel(ROT_VAR, TRANS_VAR);
+	std::vector<double> alphas = ALPHAS;
+	MotionModel motionModel(ROT1_VAR, TRANS_VAR, ROT2_VAR, alphas);
 	SensorModel sensorModel(
 			Z_HIT,
 			Z_SHORT,
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure);
+			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap);
 			particleHistory.push_back(particleFilter.particles[0]);
 		}
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration

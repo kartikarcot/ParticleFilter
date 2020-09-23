@@ -8,5 +8,4 @@
 #endif
 #include "spdlog/spdlog.h"
 
-inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp);
-
+void normalize_weights(std::vector<double>& weights);
