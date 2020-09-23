@@ -4,6 +4,7 @@
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #endif
+
 #include "spdlog/spdlog.h"
 #include<ParticleFilter.hpp>
 #include <Utils.hpp>

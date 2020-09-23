@@ -1,3 +1,8 @@
+## Installation prereqs
+```
+sudo apt-get install libjsoncpp-dev libopencv-dev
+```
+
 ## Commands to run for Mac
 ```
 export CC=gcc

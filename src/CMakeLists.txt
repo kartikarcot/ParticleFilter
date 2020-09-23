@@ -2,7 +2,7 @@ message("Entered here ${CMAKE_SOURCE_DIR}")
 
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
-
+find_package(jsoncpp REQUIRED)
 option(DEBUG_MODE "Debug mode" ON)
 IF(DEBUG_MODE)
 	add_definitions(-DDEBUG)

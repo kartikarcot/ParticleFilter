@@ -5,6 +5,8 @@
 #include <string.h>
 #include <vector>
 #include <memory>
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/writer.h>
 #include <opencv2/core/hal/interface.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>

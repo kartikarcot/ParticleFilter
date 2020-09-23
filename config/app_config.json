@@ -1,0 +1,35 @@
+{
+    "particleFilter":
+    {
+        "num_particles": 2000
+    },
+    "sensorModel":
+    {
+        "zHit": 0.1,
+        "zShort": 0.1,
+        "zRand": 0.1,
+        "zMAx": 0.1,
+        "zHitVar":50,
+        "zLambdaShort":0.1,
+        "raycastingstepsize":2,
+        "rayskipfactor": 5,
+        "maxrange":0.1
+    },
+    "motionModel":
+    {
+      "alpha1":0.001,
+      "alpha2":0.001,
+      "alpha3":0.001,
+      "alpha4":0.001 
+    },
+    "map":
+    {
+        "obstaclethreshold":0.3,
+        "freespacethreshold":0.1,
+        "maxrange":8000
+    },
+    "appOptions":
+    {
+        "visualizeRays":"True"
+    }
+}

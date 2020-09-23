@@ -188,7 +188,7 @@ void visualizeMap(
 
 	
 	
-	trajectory.push_back(cv::Point2d(particleVector[0].x/map->resolution, particleVector[0].y/map->resolution));
+	trajectory.push_back(cv::Point2d(particleVector[0].y/map->resolution, particleVector[0].x/map->resolution));
 
 	
 	for (const auto &pixelPosition : trajectory)
@@ -206,5 +206,5 @@ void visualizeMap(
             1);
 	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
 	cv::imshow(message, mat);
-	cv::waitKey(10);
+	cv::waitKey(2);
 }

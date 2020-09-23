@@ -3,8 +3,6 @@
 #include "Profiler.hpp"
 #include "Map.hpp"
 
-
-
 inline bool keepCasting(
 		const double &x,
 		const double &y,

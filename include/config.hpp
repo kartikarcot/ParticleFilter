@@ -11,7 +11,7 @@
 #define ROT1_VAR 0.005
 #define TRANS_VAR 0.05
 #define ROT2_VAR 0.05
-#define ALPHAS {0.1,0.1,0.1,0.1}
+#define ALPHAS {0.00001,0.00001,0.00001,0.00001}
 
 // Sensor Model
 #define Z_MAX 5

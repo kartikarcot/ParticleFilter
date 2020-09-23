@@ -1,3 +1,7 @@
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/json.h>
+
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <Map.hpp>
@@ -17,6 +21,8 @@
 
 int main(int argc, char **argv)
 {
+	std::ifstream appOptions("config/app_config.json", std::ifstream::binary);
+
 	spdlog::set_level(
         static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
 

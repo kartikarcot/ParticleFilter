@@ -14,7 +14,8 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #endif
 #include "spdlog/spdlog.h"
-
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/writer.h>
 int main(int argc, char **argv)
 {
 	spdlog::set_level(
