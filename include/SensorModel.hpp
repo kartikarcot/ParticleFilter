@@ -39,7 +39,7 @@ class SensorModel
 							const std::shared_ptr<Map> &map);
 
 		double rayCastingstepSize = RAY_CASTING_STEP_SIZE;
-		double threshold = THRESHOLD;
+		double threshold = OBSTACLE_THRESHOLD;
 		double laserMaxRange = MAX_RANGE; 
 		double laserMinRange = 0;
 		

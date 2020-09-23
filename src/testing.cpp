@@ -16,7 +16,6 @@
 
 int main(int argc, char **argv)
 {
-
 	SensorModel sensorModel(
 			Z_HIT,
 			Z_SHORT,

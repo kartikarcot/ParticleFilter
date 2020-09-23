@@ -11,6 +11,7 @@
 #include <vector>
 #include <random>
 #include <memory>
+#include<Utils.hpp>
 #include <Map.hpp>
 
 #define SEED 0
@@ -19,12 +20,7 @@
 // forward declaration to subvert circular include issue
 class Map;
 
-struct Pose2D
-{
-    double x, y, theta;
-	Pose2D(double _x, double _y, double _theta) : x(_x), y(_y), theta(_theta) {}
-	Pose2D() : x(-1.0), y(-1.0), theta(-1.0) {}
-};
+
 
 
 class ParticleFilter

@@ -1,9 +1,11 @@
 #include<Utils.hpp>
 
 
-inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
+void normalize_weights(std::vector<double>& weights)
 {
-    int xCell =int(x), yCell =int(y);
-    return (mp->data[yCell][xCell] >= 0.0 && mp->data[yCell][xCell] <= 0.1); 
+    double sum = 0 ;
+    for(auto &weight:weights)
+        sum+=weight;
+    for(auto &weight:weights)
+        weight/=sum;
 }
-

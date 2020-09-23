@@ -17,3 +17,9 @@ function pf() {
 	export PS1="\e[0;31m[\u@\h \W]\$ \e[m "
 }
 ```
+
+## TODO:
+- [ ] Add config file
+- [ ] Add types.h for standard types used like Map and Pose2D
+- [ ] Tune hyperparameters
+- [ ] Add tests in separate directory

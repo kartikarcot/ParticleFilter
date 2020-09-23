@@ -1,12 +1,9 @@
-#include "Map.hpp"
+#include <Map.hpp>
 #include <fstream>
 #include <memory>
 #include <sstream>
-#include "opencv2/core/hal/interface.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
 
+std::vector<cv::Point2d> trajectory;
 
 
 // @TODO: 
@@ -190,23 +187,24 @@ void visualizeMap(
 	}
 
 	
-	for (const auto &particlePose : particleVector)
+	
+	trajectory.push_back(cv::Point2d(particleVector[0].x/map->resolution, particleVector[0].y/map->resolution));
+
+	
+	for (const auto &pixelPosition : trajectory)
 	{
-		cv::circle(mat, 
-				cv::Point2d(particlePose.x/map->resolution, particlePose.y/map->resolution), 
+		cv::circle(mat, pixelPosition, 
 				1, cv::Scalar(0,0,255), -1); 
 	}
 
-	
-	cv::circle(mat, 
-			cv::Point2d(
-				particleVector[particleVector.size()-1].x/map->resolution, 
-				particleVector[particleVector.size()-1].y/map->resolution), 
-			2,
-			cv::Scalar(0,255,0),
-			-1); 
-
+	cv::putText(mat,
+            std::string("Log_num: " + std::to_string(trajectory.size())+" Position: "+std::to_string(particleVector[0].x)+","+std::to_string(particleVector[0].y)),
+            cv::Point(30,30), // Coordinates
+            cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+            5.0, // Scale. 2.0 = 2x bigger
+            cv::Scalar(255,255,255), // BGR Color
+            1);
 	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
 	cv::imshow(message, mat);
-	cv::waitKey(500);
+	cv::waitKey(10);
 }

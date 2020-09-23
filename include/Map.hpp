@@ -5,11 +5,23 @@
 #include <string.h>
 #include <vector>
 #include <memory>
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 #include <utility>
-#include <ParticleFilter.hpp>
+#ifdef DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include "spdlog/spdlog.h"
 
 // forward declaration to subvert circular include issue
-struct Pose2D;
+struct Pose2D
+{
+    double x, y, theta;
+	Pose2D(double _x, double _y, double _theta) : x(_x), y(_y), theta(_theta) {}
+	Pose2D() : x(-1.0), y(-1.0), theta(-1.0) {}
+};
 
 class Map
 {

@@ -2,11 +2,14 @@
 #define CONFIG_H
 
 // Particle Fileter
+#define MOTION_MODEL_DEBUG false
 #define NUM_PARTICLES 2000
 
+#define ALPHAS {0.1,0.1,0.1,0.1}
 // Motion Model
-#define ROT_VAR 0.05
+#define ROT1_VAR 0.05
 #define TRANS_VAR 0.05
+#define ROT2_VAR 0.05
 
 // Sensor Model
 #define Z_MAX 0.001
@@ -21,10 +24,12 @@
 #define RAY_SKIP_FACTOR 2
 
 // Map
-#define THRESHOLD 0.3
+#define OBSTACLE_THRESHOLD 0.3
 #define FREE_SPACE_THRESHOLD 0.1
 // range should be ints
 #define MAX_RANGE 8000
 #define VISUALIZE_RAYS false
 
+#define POS_VAR 5
+#define THETA_VAR 2
 #endif

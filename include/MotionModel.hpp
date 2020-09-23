@@ -12,29 +12,30 @@
 struct OdomModelNoise
 {
     
-    double rotVar;
+    double rot1Var;
     double transVar;
+    double rot2Var;
     
     
     //Assume a gaussian noise for each of the motions
     std::vector<std::normal_distribution<double>> dists;
 
-    OdomModelNoise(double _rotVar, double _transVar): 
-    rotVar(_rotVar),transVar(_transVar)
+    OdomModelNoise(double _rot1Var, double _transVar, double _rot2Var): 
+    rot1Var(_rot1Var),transVar(_transVar),rot2Var(_rot2Var)
 	{
-        dists.push_back(std::normal_distribution<double>(0.0,rotVar));
+        dists.push_back(std::normal_distribution<double>(0.0,rot1Var));
         dists.push_back(std::normal_distribution<double>(0.0,transVar));
-        dists.push_back(std::normal_distribution<double>(0.0,rotVar));
+        dists.push_back(std::normal_distribution<double>(0.0,rot2Var));
     }
 };
 
 
 class MotionModel
 {
-
+    std::vector<double> alphas;
     OdomModelNoise processNoise;
     public:
-    MotionModel(double _rotVar,double _transVar);
+    MotionModel(double _rot1Var,double _transVar,double _rot2Var,std::vector<double> alphas);
     void predictOdometryModel(Pose2D& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure, std::shared_ptr<Map> mp);
 
 };

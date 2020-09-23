@@ -4,19 +4,12 @@
 
 #define PI 3.14159
 
-void normalize_weights(std::vector<double>& weights)
-{
-    double sum = 0 ;
-    for(auto &weight:weights)
-        sum+=weight;
-    for(auto &weight:weights)
-        weight/=sum;
-}
 
 inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
 {
     return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD); 
 }
+
 
 ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
 				numParticles(_numParticles),
