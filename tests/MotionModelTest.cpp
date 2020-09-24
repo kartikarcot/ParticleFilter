@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	
 	spdlog::set_pattern("%^[%l] [%s]%$ %v");
 
-	if (argc!=3)
+	if (argc!=4)
 	{
 		SPDLOG_ERROR("Invalid number of arguments\n.  \
 				Follow this format <path to exec> <path to map> <path to log>");
