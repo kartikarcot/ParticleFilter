@@ -17,10 +17,12 @@ inline bool isFreespace(
 ParticleFilter::ParticleFilter(
 					const size_t _numParticles, 
 					const std::shared_ptr<Map> &mp,
-					const double &posVar,
-					const double &thetaVar) : 
+					const double &_posVar,
+					const double &_thetaVar) : 
 						numParticles(_numParticles),
-						weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
+						weights(std::vector<double>(_numParticles, 1/double(_numParticles))),
+						posVar(_posVar),
+						thetaVar(_thetaVar)
 {
     
     std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
