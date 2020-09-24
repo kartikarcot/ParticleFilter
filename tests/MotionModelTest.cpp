@@ -55,7 +55,10 @@ int main(int argc, char **argv)
 						};
 
 	MotionModel motionModel(alphas);
-	particleFilter.particles[0] = Pose2D(3400,4250,-285.0/180.0);
+	for (int i = 0; i < 1; i++)
+	{
+		particleFilter.particles[i] = Pose2D(1000,0,0);
+	}
 	
 	bool firstTime = true;
 	Pose2D odomPreviousMeasure, odomCurrentMeasure;
@@ -77,7 +80,7 @@ int main(int argc, char **argv)
 
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
-		motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
+		/* motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap, true); */
 
 		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{	
