@@ -37,7 +37,12 @@ class MotionModel
     OdomModelNoise processNoise;
     public:
     MotionModel(std::vector<double> alphas);
-    bool predictOdometryModel(Pose2D& p, Pose2D& odomPreviousMeasure, Pose2D& odomCurrentMeasure, std::shared_ptr<Map> mp, bool ignoreObstacles);
+	bool predictOdometryModel(
+			Pose2D& p, 
+			const Pose2D& odomPreviousMeasure, 
+			const Pose2D& odomCurrentMeasure, 
+			const std::shared_ptr<Map> &mp, 
+			bool ignoreObstacles);
 
 };
 

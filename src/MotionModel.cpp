@@ -6,7 +6,11 @@ MotionModel::MotionModel(std::vector<double> _alphas) :
                   
               }
 
-bool MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent, std::shared_ptr<Map> mp, bool ignoreObstacles)
+bool MotionModel::predictOdometryModel(
+		Pose2D& particlePose, 
+		const Pose2D& robotPoseinOdomFramePrev, 
+		const Pose2D& robotPoseinOdomFrameCurrent, 
+		const std::shared_ptr<Map> &mp, bool ignoreObstacles)
 {
 
     double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
@@ -46,5 +50,4 @@ bool MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
         return true;
     }
     else return false;
-    
 }

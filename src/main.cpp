@@ -93,15 +93,21 @@ int main(int argc, char **argv)
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
 
-		
+		#pragma omp parallel for
 		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			
-			if(!motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, false))
-				particleFilter.weights[i] = 0;
-
+			#pragma omp critical
+			{
+				if(!motionModel.predictOdometryModel(
+								particleFilter.particles[i], 
+								odomPreviousMeasure, 
+								odomCurrentMeasure, 
+								worldMap, 
+								false))
+					particleFilter.weights[i] = 0;
+			}
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{

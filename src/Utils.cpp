@@ -3,7 +3,6 @@
 
 void normalizeAndShiftWeights(std::vector<double>& weights)
 {
-	SPDLOG_DEBUG("Entered");
     double sum = 0 ;
 	double minValue = *(std::min_element(weights.begin(), weights.end()));
 
