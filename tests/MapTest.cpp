@@ -53,7 +53,9 @@ inline bool keepGoing(std::fstream &fsm, std::string &line)
 return (std::getline(fsm, line) && (line.compare(0,13,"global_map[0]") != 0));
 }
 
-std::shared_ptr<Map> makeMap(const std::string &fName)
+std::shared_ptr<Map> makeMap(const std::string &fName,
+						const double &freespaceThreshold,
+						const double &obstacleThreshold)
 {
 std::fstream fsm(fName);
 	int mapsize_x;
@@ -104,10 +106,10 @@ std::fstream fsm(fName);
 			std::string temp;
 			ss.clear();
 			ss<<line;
-			ss>>temp>>mapsize_y>>mapsize_x;
+			ss>>temp>>mapsize_x>>mapsize_y;
 			if (ss.fail())
 				throw "Invalid Map size provided";
-			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_y, mapsize_x);
+			SPDLOG_INFO("MAPSIZE {} X {}", mapsize_x, mapsize_y);
 		}
 	}
 	catch (const char *msg)
@@ -115,6 +117,7 @@ std::fstream fsm(fName);
 		SPDLOG_ERROR("{}",msg);
 		exit(1);
 	}
+
 
 	// allocate a 2D array of size (mapsize_y,mapsize_x)
 	std::vector<std::vector<float>> mapData(mapsize_y,std::vector<float>(mapsize_x,0));
@@ -164,7 +167,9 @@ std::fstream fsm(fName);
 			mapsize_y*resolution,
 			resolution,
 			autoshifted_x,
-			autoshifted_y);
+			autoshifted_y,
+			freespaceThreshold,
+			obstacleThreshold);
 }
 
 void visualizeMap(

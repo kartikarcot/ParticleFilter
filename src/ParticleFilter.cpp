@@ -5,15 +5,22 @@
 #define PI 3.14159
 
 
-inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
+inline bool isFreespace(
+		const float &x, 
+		const float &y, 
+		const std::shared_ptr<Map> &mp)
 {
-    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD); 
+    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= mp->freespaceThreshold); 
 }
 
 
-ParticleFilter::ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp) : 
-				numParticles(_numParticles),
-				weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
+ParticleFilter::ParticleFilter(
+					const size_t _numParticles, 
+					const std::shared_ptr<Map> &mp,
+					const double &posVar,
+					const double &thetaVar) : 
+						numParticles(_numParticles),
+						weights(std::vector<double>(_numParticles, 1/double(_numParticles)))
 {
     
     std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
@@ -51,7 +58,7 @@ void ParticleFilter::resample()
 	/* } */
 	/* std::cout<<std::endl; */
 
-	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 	std::random_device rd;
 	std::default_random_engine generator(SEED);
     // normalize_weights(weights);
@@ -77,7 +84,7 @@ void ParticleFilter::lowVarianceResample()
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 	std::vector<Pose2D> newParticles(numParticles);
-	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
 	normalize_weights(weights);
@@ -111,7 +118,7 @@ void ParticleFilter::lowVarianceResampleTest()
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 	std::vector<Pose2D> newParticles(numParticles);
-	std::normal_distribution<double> x_noise(0.0,POS_VAR), y_noise(0.0,POS_VAR), theta_noise(0.0,THETA_VAR);
+	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
 	normalize_weights(weights);

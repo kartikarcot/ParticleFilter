@@ -33,9 +33,12 @@ public:
     std::vector<Pose2D> particles;
 
     std::vector<double> weights;
-
+	double posVar, thetaVar;
     // Initialise the particle filter
-    ParticleFilter(const size_t _numParticles, std::shared_ptr<Map> mp);
+    ParticleFilter(const size_t _numParticles,
+			const std::shared_ptr<Map> &mp,
+			const double &posVar,
+			const double &thetaVar);
 
     /* predict the state for the next time step
 	 *   using the motion model.

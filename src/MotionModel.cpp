@@ -1,19 +1,10 @@
 #include <MotionModel.hpp>
 #include <Utils.hpp>
 
-
-
-inline bool isFreespace(float x, float y, std::shared_ptr<Map> mp)
-{
-    return (mp->valid(x,y) && mp->at(x,y) >= 0.0 && mp->at(x,y) <= FREE_SPACE_THRESHOLD);
-}
-
-
-
-MotionModel::MotionModel(double rot1Var, double trans1Var, double rot2Var, std::vector<double> _alphas) : 
-				processNoise(OdomModelNoise(rot1Var, trans1Var,rot2Var)),alphas(_alphas){}
-
-
+MotionModel::MotionModel(std::vector<double> _alphas) : 
+			  processNoise(OdomModelNoise(0.001,0.001,0.001)),alphas(_alphas){
+                  
+              }
 
 void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPoseinOdomFramePrev, Pose2D& robotPoseinOdomFrameCurrent, std::shared_ptr<Map> mp, bool ignoreObstacles)
 {
@@ -47,7 +38,7 @@ void MotionModel::predictOdometryModel(Pose2D& particlePose, Pose2D& robotPosein
     auto newX = particlePose.x + transBar * cos( rot1Bar + particlePose.theta);
     auto newY = particlePose.y + transBar * sin( rot1Bar + particlePose.theta);
     
-    if( ignoreObstacles || isFreespace(newX, newY, mp) )
+    if( ignoreObstacles || mp->isFreespace(newX, newY) )
     {
         particlePose.x = newX;
         particlePose.y = newY;

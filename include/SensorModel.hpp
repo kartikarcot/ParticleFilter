@@ -20,7 +20,16 @@ class SensorModel
 
 	public:
 	
-	SensorModel(double zHit, double zShort, double zMax, double zRand, double zHitVar, double zLambdaShort);
+	SensorModel(double zHit, 
+			double zShort, 
+			double zMax, 
+			double zRand, 
+			double zHitVar, 
+			double zLambdaShort,
+			double rayCastingstepSize,
+			double laserMaxRange,
+			int rayskipfactor,
+			bool visualizeRays);
 		
 	double beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 						const Pose2D &robotPoseInOdomFrame,
@@ -38,11 +47,12 @@ class SensorModel
 
 	private:
 
-		double rayCastingstepSize = RAY_CASTING_STEP_SIZE;
-		double threshold = OBSTACLE_THRESHOLD;
-		double laserMaxRange = MAX_RANGE; 
+		double rayCastingstepSize;
+		double laserMaxRange;
 		double laserMinRange = 0;
-		
+		int rayskipfactor;
+		bool visualizeRays;
+
 
 		//Sensor model probability parameters
 		double zHit;

@@ -6,15 +6,36 @@
 inline bool keepCasting(
 		const double &x,
 		const double &y,
-		const double &threshold,
 		const std::shared_ptr<Map> &worldMap)
 {
-	return (worldMap->valid(x,y) && worldMap->at(x,y) >= 0 && worldMap->at(x,y) < threshold);
+	if (worldMap->valid(x,y))
+	{
+		const float &val = worldMap->at(x,y);
+		return (val > 0 && val < worldMap->obstacleThreshold);
+	}
+	return false;
 }
 
-
-SensorModel::SensorModel(double _zHit, double _zShort, double _zMax, double _zRand, double _zHitVar, double _zLambdaShort)
-: zHit(_zHit), zShort(_zShort), zMax(_zMax), zRand(_zRand), zHitVar(_zHitVar), zLambdaShort(_zLambdaShort)
+SensorModel::SensorModel(double _zHit, 
+		double _zShort, 
+		double _zMax, 
+		double _zRand, 
+		double _zHitVar, 
+		double _zLambdaShort,
+		double _rayCastingStepSize,
+		double _laserMaxRange,
+		int _raySkipFactor,
+		bool _visualizeRays): 
+	zHit(_zHit), 
+	zShort(_zShort), 
+	zMax(_zMax), 
+	zRand(_zRand), 
+	zHitVar(_zHitVar), 
+	zLambdaShort(_zLambdaShort),
+	rayCastingstepSize(_rayCastingStepSize),
+	laserMaxRange(_laserMaxRange),
+	rayskipfactor(_raySkipFactor),
+	visualizeRays(_visualizeRays)
 {}
 
 std::vector<int> SensorModel::rayCasting(
@@ -33,44 +54,39 @@ std::vector<int> SensorModel::rayCasting(
 			particlePoseInWorldFrame.theta + deltaTheta);
 
 	// perform ray casting from the laserPoseInWorldFrame
-	std::vector<int> simulatedRayCast(180/RAY_SKIP_FACTOR,laserMaxRange);
-	#if defined(DEBUG) && VISUALIZE_RAYS
-		std::vector<Pose2D> rayPoints;
-	#endif
+	std::vector<int> simulatedRayCast(180/rayskipfactor,laserMaxRange);
+	std::vector<Pose2D> rayPoints;
 	// iterate from 0 to 180 degrees
 
 	// SPDLOG_DEBUG("ORIGIN ({},{}): {}", 
 	//		std::round(laserPoseInWorldFrame.x), 
 	//		std::round(laserPoseInWorldFrame.y), 
 	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
-	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=RAY_SKIP_FACTOR)
+	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=rayskipfactor)
 	{
 		double slopeAngle = PI/2 - TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;
 		while (count*rayCastingstepSize < laserMaxRange && 
-				keepCasting(xNew, yNew, threshold, worldMap))
+				keepCasting(xNew, yNew, worldMap))
 		{
 			xNew = laserPoseInWorldFrame.x + count*rayCastingstepSize*cos(slopeAngle);
 			yNew = laserPoseInWorldFrame.y + count*rayCastingstepSize*sin(slopeAngle);
 
-			#if defined(DEBUG) && VISUALIZE_RAYS
+			if (visualizeRays)
 				rayPoints.push_back(Pose2D(xNew, yNew, 0));
-			#endif
 
 			count++;
 		}
 		simulatedRayCast[index++] = (int)std::min(laserMaxRange,std::max(0.0,std::round(rayCastingstepSize*(count-1))));
-		#if defined(DEBUG) && VISUALIZE_RAYS
-			visualizeMap(worldMap, rayPoints, "Raycast visualization", TIMEOUT);
-		#endif
 	}
 
-	#if defined(DEBUG) && VISUALIZE_RAYS
+	if (visualizeRays)
+	{
 		rayPoints.push_back(laserPoseInWorldFrame);
-		visualizeMap(worldMap, rayPoints, "Raycast visualization", TIMEOUT);
-	#endif
+		visualizeMap(worldMap, rayPoints, "Raycast visualization", 10);
+	}
 	return simulatedRayCast;
 }
 
@@ -87,7 +103,7 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 											worldMap);
 	
 	double logProb = 0;
-	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=RAY_SKIP_FACTOR)
+	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=rayskipfactor)
 	{
 		double realMeas = (double)realLaserData[i], simMeas = (double)simulatedLaserData[j++];
 		logProb += log (zHit * pHit(realMeas,simMeas)

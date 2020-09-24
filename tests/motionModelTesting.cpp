@@ -9,13 +9,12 @@
 #include "Profiler.hpp"
 #include "config.hpp"
 #include <fstream>
-
+#include <json.hpp>
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #endif
 #include "spdlog/spdlog.h"
-#include <jsoncpp/json/json.h>
-#include <jsoncpp/json/writer.h>
+
 int main(int argc, char **argv)
 {
 	spdlog::set_level(
@@ -30,22 +29,44 @@ int main(int argc, char **argv)
 		return 1; 
 	}
 
+	Config::initializeConfig(std::string(argv[3]));
+	std::shared_ptr<Config> cfg = Config::getInstance();
 	// initialize map, particle filter and sensor modes
-	std::shared_ptr<Map> worldMap = makeMap(std::string(argv[1]));
+	std::shared_ptr<Map> worldMap = makeMap(
+									std::string(argv[1]),
+									cfg->get<double>("freespacethreshold"),
+									cfg->get<double>("obstaclethreshold"));
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
-	ParticleFilter particleFilter = ParticleFilter(1 , worldMap);
+	ParticleFilter particleFilter = ParticleFilter(
+									1) , 
+									worldMap,
+									cfg->get<double>("posvar"),
+									cfg->get<double>("thetavar"));
+
+	std::vector<double> alphas = {
+							cfg->get<double>("alpha1"),
+							cfg->get<double>("alpha2"),
+							cfg->get<double>("alpha3"),
+							cfg->get<double>("alpha4")
+						};
+
+	MotionModel motionModel(alphas);
+	
 	particleFilter.particles[0] = Pose2D(4000,4000,0);
-	std::vector<double> alphas = ALPHAS;
-	MotionModel motionModel(ROT1_VAR, TRANS_VAR, ROT2_VAR, alphas);
+	
 	SensorModel sensorModel(
-			Z_HIT,
-			Z_SHORT,
-			Z_MAX,
-			Z_RAND,
-			Z_HIT_VAR,
-			Z_LAMBDA_SHORT);
+			cfg->get<double>("zHit"),
+			cfg->get<double>("zShort"),
+			cfg->get<double>("zMax"),
+			cfg->get<double>("zRand"),
+			cfg->get<double>("zHitVar"),
+			cfg->get<double>("zLambdaShort"),
+			cfg->get<double>("raycastingstepsize"),
+			cfg->get<double>("maxrange"),
+			cfg->get<int>("rayskipfactor"),
+			cfg->get<bool>("visualizeRays"));
 
 	// declare some useful variables used in MCL
 	bool firstTime = true;

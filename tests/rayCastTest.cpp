@@ -6,6 +6,7 @@
 #include <MotionModel.hpp>
 #include <SensorModel.hpp>
 #include <boost/optional.hpp>
+#include <json.hpp>
 #include "Profiler.hpp"
 #include "config.hpp"
 #include <fstream>
@@ -21,7 +22,10 @@ int main(int argc, char **argv)
         static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
 
 	spdlog::set_pattern("%^[%l] [%s]%$ %v");
-	std::fstream fsm("/Users/stark/Projects/16833_HW1_ParticleFilter/build/laser.txt");
+	std::fstream fsm("/Users/stark/Projects/16833_HW1_ParticleFilter/build/laser.txt",std::ios::out);
+
+	Config::initializeConfig(std::string(argv[3]));
+	std::shared_ptr<Config> cfg = Config::getInstance();
 
 	if (argc!=3)
 	{
@@ -31,20 +35,32 @@ int main(int argc, char **argv)
 	}
 
 	// initialize map, particle filter and sensor modes
-	std::shared_ptr<Map> worldMap = makeMap(std::string(argv[1]));
+	std::shared_ptr<Map> worldMap = makeMap(
+									std::string(argv[1]),
+									cfg->get<double>("freespacethreshold"),
+									cfg->get<double>("obstaclethreshold"));
 	LogReader logReader((std::string(argv[2])));
 	boost::optional<Log> log;
 
-	ParticleFilter particleFilter = ParticleFilter(1 , worldMap);
+	ParticleFilter particleFilter = ParticleFilter(
+									cfg->get<int>("num_particles") , 
+									worldMap,
+									cfg->get<double>("posvar"),
+									cfg->get<double>("thetavar"));
+
 	particleFilter.particles[0] = Pose2D(8000-3950,4560, -PI/2);
 	/* particleFilter.particles[0] = Pose2D(8000-7100,4400, -PI/2); */
 	SensorModel sensorModel(
-			Z_HIT,
-			Z_SHORT,
-			Z_MAX,
-			Z_RAND,
-			Z_HIT_VAR,
-			Z_LAMBDA_SHORT);
+			cfg->get<double>("zHit"),
+			cfg->get<double>("zShort"),
+			cfg->get<double>("zMax"),
+			cfg->get<double>("zRand"),
+			cfg->get<double>("zHitVar"),
+			cfg->get<double>("zLambdaShort"),
+			cfg->get<double>("raycastingstepsize"),
+			cfg->get<double>("maxrange"),
+			cfg->get<int>("rayskipfactor"),
+			cfg->get<bool>("visualizeRays"));
 
 	// declare some useful variables used in MCL
 	bool firstTime = true;

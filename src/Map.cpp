@@ -17,14 +17,18 @@ Map::Map(
 		const int &ySize,
 		const int &res,
 		const int &autoX,
-		const int &autoY) : 
+		const int &autoY,
+		const double &freespaceThresh,
+		const double &obstacleThresh) : 
 		fileName(fName),
 		data(mapData),
 		mapSizeX(xSize),
 		mapSizeY(ySize),
 		resolution(res),
 		autoshiftedX(autoX),
-		autoshiftedY(autoY)
+		autoshiftedY(autoY),
+		freespaceThreshold(freespaceThresh),
+		obstacleThreshold(obstacleThresh)
 	{
 		SPDLOG_INFO("The size of the data vector is {} {}", mapData.size(), mapData[0].size());
 		minX=0;
@@ -56,7 +60,19 @@ inline bool keepGoing(std::fstream &fsm, std::string &line)
 return (std::getline(fsm, line) && (line.compare(0,13,"global_map[0]") != 0));
 }
 
-std::shared_ptr<Map> makeMap(const std::string &fName)
+bool Map::isFreespace(const double &x, const double &y)
+{
+	if (valid(x,y))
+	{
+		const float &val = at(x,y);
+		return (val > 0 && val < freespaceThreshold);
+	}
+	return false;
+}
+
+std::shared_ptr<Map> makeMap(const std::string &fName,
+						const double &freespaceThreshold,
+						const double &obstacleThreshold)
 {
 std::fstream fsm(fName);
 	int mapsize_x;
@@ -167,7 +183,9 @@ std::fstream fsm(fName);
 			mapsize_y*resolution,
 			resolution,
 			autoshifted_x,
-			autoshifted_y);
+			autoshifted_y,
+			freespaceThreshold,
+			obstacleThreshold);
 }
 
 void visualizeMap(
