@@ -8,6 +8,6 @@
 #endif
 #include "spdlog/spdlog.h"
 
-void normalize_weights(std::vector<double>& weights);
+void normalizeAndShiftWeights(std::vector<double>& weights);
 
 

@@ -89,7 +89,7 @@ void ParticleFilter::lowVarianceResample()
 	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
-	normalize_weights(weights);
+	normalizeAndShiftWeights(weights);
 	// calculate the cumulativeWeightvector
 	cumulativeWeights[0] = weights[0];
 	for (int i = 1; i < numParticles; i++)
@@ -123,7 +123,7 @@ void ParticleFilter::lowVarianceResampleTest()
 	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
-	normalize_weights(weights);
+	normalizeAndShiftWeights(weights);
 	// calculate the cumulativeWeightvector
 	cumulativeWeights[0] = weights[0];
 	for (int i = 1; i < numParticles; i++)

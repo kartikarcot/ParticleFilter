@@ -113,7 +113,7 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 								
 	}
 	/* SPDLOG_DEBUG("The logProb value is {}", logProb); */
-	return exp(logProb);
+	return (logProb);
 	
 }
 
