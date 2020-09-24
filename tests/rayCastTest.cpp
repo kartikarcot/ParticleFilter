@@ -22,12 +22,12 @@ int main(int argc, char **argv)
         static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
 
 	spdlog::set_pattern("%^[%l] [%s]%$ %v");
-	std::fstream fsm("/Users/stark/Projects/16833_HW1_ParticleFilter/build/laser.txt",std::ios::out);
+	std::fstream fsm("/Users/stark/Projects/ParticleFilter/build/laser.txt",std::ios::out);
 
 	Config::initializeConfig(std::string(argv[3]));
 	std::shared_ptr<Config> cfg = Config::getInstance();
 
-	if (argc!=3)
+	if (argc!=4)
 	{
 		SPDLOG_ERROR("Invalid number of arguments\n.  \
 				Follow this format <path to exec> <path to map> <path to log>");

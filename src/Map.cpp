@@ -65,7 +65,7 @@ bool Map::isFreespace(const double &x, const double &y)
 	if (valid(x,y))
 	{
 		const float &val = at(x,y);
-		return (val > 0 && val < freespaceThreshold);
+		return (val >= 0 && val < freespaceThreshold);
 	}
 	return false;
 }

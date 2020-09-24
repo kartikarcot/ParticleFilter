@@ -8,6 +8,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
 option(BUILD_TESTS "Build test programs" OFF)
 
+option(DEBUG_MODE "Debug mode" ON)
+IF(DEBUG_MODE)
+	add_definitions(-DDEBUG)
+ENDIF(DEBUG_MODE)
+
 
 add_subdirectory(src)
 if(BUILD_TESTS)

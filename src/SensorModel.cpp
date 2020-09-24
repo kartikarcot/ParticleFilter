@@ -11,7 +11,7 @@ inline bool keepCasting(
 	if (worldMap->valid(x,y))
 	{
 		const float &val = worldMap->at(x,y);
-		return (val > 0 && val < worldMap->obstacleThreshold);
+		return (val >= 0 && val < worldMap->obstacleThreshold);
 	}
 	return false;
 }
