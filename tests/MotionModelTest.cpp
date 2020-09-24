@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	
 	spdlog::set_pattern("%^[%l] [%s]%$ %v");
 
-	if (argc!=4)
+	if (argc<=4)
 	{
 		SPDLOG_ERROR("Invalid number of arguments\n.  \
 				Follow this format <path to exec> <path to map> <path to log>");
@@ -55,7 +55,10 @@ int main(int argc, char **argv)
 						};
 
 	MotionModel motionModel(alphas);
-	particleFilter.particles[0] = Pose2D(3400,4250,-285.0/180.0);
+	double posX = stod(std::string(argv[4])); //3400
+	double posY = stod(std::string(argv[5])); //4250
+	double theta = stod(std::string(argv[6])); //-300/180
+	particleFilter.particles[0] = Pose2D(posX,posY,TO_RADIANS(theta));
 	
 	bool firstTime = true;
 	Pose2D odomPreviousMeasure, odomCurrentMeasure;
@@ -78,15 +81,8 @@ int main(int argc, char **argv)
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
 		motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
-
-		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
-		{	
-			// auto particlePose = particleFilter.particles[i];
-			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
-			trajectory.push_back(particleFilter.particles[0]);
-		}
-
+		trajectory.push_back(particleFilter.particles[0]);
+		
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;	
     }

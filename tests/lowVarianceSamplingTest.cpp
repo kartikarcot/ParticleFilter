@@ -37,6 +37,6 @@ int main(int argc, char **argv)
 	std::vector<double> weights = {10, 40, 60, 30};
 	particleFilter.weights = weights;
 	// read logs and perform probabilistic updates
-	particleFilter.lowVarianceResampleTest();
+	particleFilter.lowVarianceResampleTest(worldMap);
 	return 0;
 }

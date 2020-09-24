@@ -98,12 +98,15 @@ int main(int argc, char **argv)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
-			motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, false);
+			
+			if(!motionModel.predictOdometryModel(particleFilter.particles[i], odomPreviousMeasure, odomCurrentMeasure, worldMap, false))
+				particleFilter.weights[i] = 0;
 
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{
-				particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
+				if(particleFilter.weights[i]!=0)
+					particleFilter.weights[i] += sensorModel.beamRangeFinderModel(
 											log->laserPose,
 											odomCurrentMeasure,
 											particleFilter.particles[i],
@@ -114,7 +117,7 @@ int main(int argc, char **argv)
 
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
-		particleFilter.lowVarianceResample();
+		particleFilter.lowVarianceResample(worldMap);
 		#ifdef DEBUG
 			visualizeMap(worldMap, particleFilter.particles, "Particles Visualization");
 		#endif

@@ -32,10 +32,10 @@ int main(int argc, char **argv)
 			cfg->get<int>("rayskipfactor"),
 			cfg->get<bool>("visualizeRays"));
 
-	double z_star = 1000;
+	double z_star = stod(std::string(argv[4]));
 	auto z_values = sensorModel.testingData(z_star);
 	std::fstream fsm;
-	fsm.open("/Users/stark/Projects/16833_HW1_ParticleFilter/build/z_vals.txt",std::ios::out);
+	fsm.open("z_vals.txt",std::ios::out);
 	for (const auto &val : z_values)
 		fsm<<val<<std::endl;
 	fsm.close();

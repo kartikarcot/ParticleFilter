@@ -57,8 +57,8 @@ public:
     void resample();
 
 	// Low variance resampling technique
-	void lowVarianceResample();
-	void lowVarianceResampleTest();
+	void lowVarianceResample(const std::shared_ptr<Map> &mp);
+	void lowVarianceResampleTest(const std::shared_ptr<Map> &mp);
 };
 
 #endif

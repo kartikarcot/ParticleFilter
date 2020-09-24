@@ -119,8 +119,8 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 
 std::vector<double> SensorModel::testingData(double z_star)
 {
-	std::vector<double> z_values(laserMaxRange);
-	for (size_t i = 0; i < size_t(laserMaxRange*1.1); i++)
+	std::vector<double> z_values(laserMaxRange+10);
+	for (size_t i = 0; i < size_t(laserMaxRange+10); i++)
 	{
 		
 		z_values[i] =  zHit * pHit((double)i,z_star)

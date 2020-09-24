@@ -17,7 +17,7 @@ void normalizeAndShiftWeights(std::vector<double>& weights)
 
     for (auto &weight : weights)
     {
-        weight = exp((weight - minValue)/5);
+        weight = exp((weight - minValue)/2);
         sum += weight;
     }
 

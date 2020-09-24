@@ -77,7 +77,7 @@ void ParticleFilter::resample()
 	return;
 }
 
-void ParticleFilter::lowVarianceResample()
+void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp)
 {
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
@@ -103,15 +103,20 @@ void ParticleFilter::lowVarianceResample()
 		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
-		newParticles[i].x += x_noise(generator);
-		newParticles[i].y += y_noise(generator);
+		auto newX = newParticles[i].x + x_noise(generator);
+		auto newY = newParticles[i].y + y_noise(generator);
+		if(isFreespace(newX,newY,mp))
+		{
+			newParticles[i].x = newX;
+			newParticles[i].y = newY;
+		}
 		newParticles[i].theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
 	return;
 }
 
-void ParticleFilter::lowVarianceResampleTest()
+void ParticleFilter::lowVarianceResampleTest(const std::shared_ptr<Map> &mp)
 {
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
@@ -137,10 +142,20 @@ void ParticleFilter::lowVarianceResampleTest()
 		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
 		countMap[index]++;
 		// calculate the new partcle with some noise
+		
 		newParticles[i] = particles[index];
-		newParticles[i].x += x_noise(generator);
-		newParticles[i].y += y_noise(generator);
+		
+		
 		newParticles[i].theta += theta_noise(generator);
+		auto newX = newParticles[i].x + x_noise(generator);
+		auto newY = newParticles[i].y + y_noise(generator);
+		if(isFreespace(newX,newY,mp))
+		{
+			newParticles[i].x = newX;
+			newParticles[i].y = newY;
+		}
+		
+		
 	}
 
 	for (const auto &it : countMap)
