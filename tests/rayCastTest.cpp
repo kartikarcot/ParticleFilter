@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
 
 	spdlog::set_pattern("%^[%l] [%s]%$ %v");
-	std::fstream fsm("/Users/stark/Projects/ParticleFilter/build/laser.txt",std::ios::out);
+	std::fstream fsm("/home/arcot/ParticleFilter/build/laser.txt",std::ios::out);
 
 	Config::initializeConfig(std::string(argv[3]));
 	std::shared_ptr<Config> cfg = Config::getInstance();
@@ -48,7 +48,8 @@ int main(int argc, char **argv)
 									cfg->get<double>("posvar"),
 									cfg->get<double>("thetavar"));
 
-	particleFilter.particles[0] = Pose2D(8000-3950,4560, -PI/2);
+	particleFilter.particles[0] = Pose2D(8000-4000,4140, -PI/2 - 10*PI/180);
+	// particleFilter.particles[0] = Pose2D(0,0, 0);
 	/* particleFilter.particles[0] = Pose2D(8000-7100,4400, -PI/2); */
 	SensorModel sensorModel(
 			cfg->get<double>("zHit"),
@@ -109,5 +110,6 @@ int main(int argc, char **argv)
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
 	}
+    visualizeMap(worldMap,particleFilter.particles, "particles", 0);
 	return 0;
 }

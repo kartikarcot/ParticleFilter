@@ -50,21 +50,17 @@ std::vector<int> SensorModel::rayCasting(
 	double deltaTheta = laserPoseInOdomFrame.theta - robotPoseInOdomFrame.theta;
 	Pose2D laserPoseInWorldFrame(
 			particlePoseInWorldFrame.x + deltaX,
-			particlePoseInWorldFrame.y +deltaY,
+			particlePoseInWorldFrame.y + deltaY,
 			particlePoseInWorldFrame.theta + deltaTheta);
 
 	// perform ray casting from the laserPoseInWorldFrame
 	std::vector<int> simulatedRayCast(180/rayskipfactor,laserMaxRange);
 	std::vector<Pose2D> rayPoints;
-	// iterate from 0 to 180 degrees
 
-	// SPDLOG_DEBUG("ORIGIN ({},{}): {}", 
-	//		std::round(laserPoseInWorldFrame.x), 
-	//		std::round(laserPoseInWorldFrame.y), 
-	//		worldMap->data[std::round(laserPoseInWorldFrame.y)][std::round(laserPoseInWorldFrame.x)]);
+	// iterate from 0 to 180 degrees
 	for (int sweepAngle = 0, index = 0; sweepAngle < 180; sweepAngle+=rayskipfactor)
 	{
-		double slopeAngle = PI/2 - TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
+		double slopeAngle = -PI/2 + TO_RADIANS(sweepAngle) + laserPoseInWorldFrame.theta;
 		double xNew = laserPoseInWorldFrame.x;
 		double yNew = laserPoseInWorldFrame.y;
 		int count = 0;
@@ -76,16 +72,19 @@ std::vector<int> SensorModel::rayCasting(
 
 			if (visualizeRays)
 				rayPoints.push_back(Pose2D(xNew, yNew, 0));
-
 			count++;
 		}
-		simulatedRayCast[index++] = (int)std::min(laserMaxRange,std::max(0.0,std::round(rayCastingstepSize*(count-1))));
+		
+		simulatedRayCast[index++] = (int)sqrt(
+										pow((float)(xNew-laserPoseInWorldFrame.x), 2) 
+										+ pow((float)(yNew-laserPoseInWorldFrame.y), 2)
+										);
 	}
 
 	if (visualizeRays)
 	{
 		rayPoints.push_back(laserPoseInWorldFrame);
-		visualizeMap(worldMap, rayPoints, "Raycast visualization", 10);
+		visualizeMap(worldMap, rayPoints, "Raycast visualization", 0);
 	}
 	return simulatedRayCast;
 }

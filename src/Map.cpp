@@ -136,15 +136,15 @@ std::fstream fsm(fName);
 	}
 
 	// allocate a 2D array of size (mapsize_y,mapsize_x)
-	std::vector<std::vector<float>> mapData(mapsize_y,std::vector<float>(mapsize_x,0));
+	std::vector<std::vector<float>> mapData(mapsize_x,std::vector<float>(mapsize_y,0));
 	// we expect mapsize_x number of rows and mapsize_y number of columns in the input
 	float val;
 	try
 	{
 		int count = 0;
-		for (int i = 0; i < mapsize_y; i++)
+		for (int i = 0; i < mapsize_x; i++)
 		{
-			for (int j = 0; j < mapsize_x; j++)
+			for (int j = 0; j < mapsize_y; j++)
 			{
 				if (!(fsm>>word))
 					throw "File did not have the required number of values!";

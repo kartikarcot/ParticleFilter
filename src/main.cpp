@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 		odomPreviousMeasure = odomCurrentMeasure;
 		particleFilter.lowVarianceResample(worldMap);
 		#ifdef DEBUG
-			visualizeMap(worldMap, particleFilter.particles, "Particles Visualization");
+			visualizeMap(worldMap, particleFilter.particles, "Particles Visualization", 50);
 		#endif
 	}
 	return 0;
