@@ -1,4 +1,5 @@
 {
+	"seed":0,
 	"num_particles": 5000,
 	"zHit": 150,
 	"zShort": 50,

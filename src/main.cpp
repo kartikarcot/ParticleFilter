@@ -77,8 +77,10 @@ int main(int argc, char **argv)
 	Pose2D particlePreviousMeasure, particleCurrentMeasure;
 	
 	// read logs and perform probabilistic updates
+	int logNum =0;
 	while((log = logReader.getLog()))
 	{
+		SPDLOG_DEBUG("Log number : {}", logNum++);
 		SPDLOG_DEBUG("The log read was {} {} {}, LogType {}", 
 				log->robotPose.x, log->robotPose.y, log->robotPose.theta, log->logType);
 		Profiler<std::chrono::milliseconds> pf("Time (ms) taken to perform one iteration of Particle Filter");

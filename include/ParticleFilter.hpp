@@ -14,7 +14,7 @@
 #include<Utils.hpp>
 #include <Map.hpp>
 
-#define SEED 0
+#define SEED 1
 //std::default_random_engine generator;//@TODO: Fix the redefinition error on using single gen, should not need two generators in two classes
 
 // forward declaration to subvert circular include issue
