@@ -36,7 +36,8 @@ class MotionModel
     std::vector<double> alphas;
     OdomModelNoise processNoise;
     public:
-    MotionModel(std::vector<double> alphas);
+    MotionModel(std::vector<double> alphas, const int &seed = 1);
+    std::default_random_engine generator;
 	bool predictOdometryModel(
 			Pose2D& p, 
 			const Pose2D& odomPreviousMeasure, 

@@ -10,12 +10,15 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <utility>
+#include "ParticleFilter.hpp"
 #ifdef DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #endif
 #include "spdlog/spdlog.h"
 
 // forward declaration to subvert circular include issue
+class ParticleFilter;
+
 struct Pose2D
 {
     double x, y, theta;
@@ -71,5 +74,10 @@ void visualizeMap(
 		const std::vector<Pose2D> &particleVector = {},
 		const std::string &message = "Map Visualization",
 		int timeout = 500);
+
+void visualizeMapWithArrows(const ParticleFilter& pf,
+							const std::shared_ptr<Map> &map,
+							const std::string &message,
+							const int &timeout);
 
 #endif

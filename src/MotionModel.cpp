@@ -1,10 +1,10 @@
 #include <MotionModel.hpp>
 #include <Utils.hpp>
 
-MotionModel::MotionModel(std::vector<double> _alphas) : 
+MotionModel::MotionModel(std::vector<double> _alphas, const int& seed) : 
 			  processNoise(OdomModelNoise(0.001,0.001,0.001)),alphas(_alphas){
-                  
-              }
+                generator = std::default_random_engine(seed); 
+            }
 
 bool MotionModel::predictOdometryModel(
 		Pose2D& particlePose, 
@@ -26,10 +26,10 @@ bool MotionModel::predictOdometryModel(
     double rot2 = robotPoseinOdomFrameCurrent.theta - rot1 - robotPoseinOdomFramePrev.theta;
 
     //Conceptual doubt : to add or subtract
-    std::default_random_engine generator(SEED);
+	std::random_device rd;
     double rot1Var = alphas[0]*rot1+alphas[1]*trans, transVar = alphas[2]*trans+alphas[3]*(rot1+rot2),rot2Var = alphas[0]*rot2 + alphas[1]*trans;
     
-    processNoise = OdomModelNoise(rot1Var,transVar,rot2Var);
+    processNoise = OdomModelNoise(sqrt(rot1Var),sqrt(transVar),sqrt(rot2Var));
     
     double rot1Bar = rot1 - processNoise.dists[0](generator);
     double transBar = trans - processNoise.dists[1](generator);

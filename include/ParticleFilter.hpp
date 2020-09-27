@@ -11,13 +11,14 @@
 #include <vector>
 #include <random>
 #include <memory>
-#include<Utils.hpp>
+#include <Utils.hpp>
 #include <Map.hpp>
 
 #define SEED 1
 //std::default_random_engine generator;//@TODO: Fix the redefinition error on using single gen, should not need two generators in two classes
 
 // forward declaration to subvert circular include issue
+struct Pose2D;
 class Map;
 
 
@@ -27,7 +28,6 @@ class ParticleFilter
 {
 public:
     
-    std::default_random_engine generator;
     const size_t numParticles;
 
     std::vector<Pose2D> particles;
@@ -38,7 +38,8 @@ public:
     ParticleFilter(const size_t _numParticles,
 			const std::shared_ptr<Map> &mp,
 			const double &posVar,
-			const double &thetaVar);
+			const double &thetaVar,
+			const int &seed = 0);
 
     /* predict the state for the next time step
 	 *   using the motion model.
@@ -57,7 +58,7 @@ public:
     void resample();
 
 	// Low variance resampling technique
-	void lowVarianceResample(const std::shared_ptr<Map> &mp);
+	void lowVarianceResample(const std::shared_ptr<Map> &mp, const int &seed = 0);
 	void lowVarianceResampleTest(const std::shared_ptr<Map> &mp);
 };
 

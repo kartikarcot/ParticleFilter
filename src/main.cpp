@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
 	Config::initializeConfig(std::string(argv[3]));
 	std::shared_ptr<Config> cfg = Config::getInstance();
-
+	bool visualizeMapFlag = cfg->get<bool>("visualizeMap");
 	// initialize map, particle filter and sensor modes
 	std::shared_ptr<Map> worldMap = makeMap(
 									std::string(argv[1]),
@@ -48,7 +48,8 @@ int main(int argc, char **argv)
 									cfg->get<int>("num_particles") , 
 									worldMap,
 									cfg->get<double>("posvar"),
-									cfg->get<double>("thetavar"));
+									cfg->get<double>("thetavar"),
+									cfg->get<int>("seed"));
 
 	std::vector<double> alphas = {
 							cfg->get<double>("alpha1"),
@@ -57,7 +58,8 @@ int main(int argc, char **argv)
 							cfg->get<double>("alpha4")
 						};
 
-	MotionModel motionModel(alphas);
+	MotionModel motionModel(alphas,
+							cfg->get<int>("seed"));
 
 	SensorModel sensorModel(
 			cfg->get<double>("zHit"),
@@ -75,7 +77,7 @@ int main(int argc, char **argv)
 	bool firstTime = true;
 	Pose2D odomPreviousMeasure, odomCurrentMeasure;
 	Pose2D particlePreviousMeasure, particleCurrentMeasure;
-	
+	Profiler<std::chrono::seconds> pf("Time(s) taken to finish");
 	// read logs and perform probabilistic updates
 	int logNum =0;
 	while((log = logReader.getLog()))
@@ -102,18 +104,18 @@ int main(int argc, char **argv)
 			// Motion Model update
 			#pragma omp critical
 			{
-				if(!motionModel.predictOdometryModel(
+				motionModel.predictOdometryModel(
 								particleFilter.particles[i], 
 								odomPreviousMeasure, 
 								odomCurrentMeasure, 
 								worldMap, 
-								false))
-					particleFilter.weights[i] = 0;
+								false);
+					/* particleFilter.weights[i] = 0; */
 			}
 			// Sensor Model update
 			if (log->logType == LogType::LASER)
 			{
-				if(particleFilter.weights[i]!=0)
+				/* if(particleFilter.weights[i]!=0) */
 					particleFilter.weights[i] += sensorModel.beamRangeFinderModel(
 											log->laserPose,
 											odomCurrentMeasure,
@@ -126,9 +128,9 @@ int main(int argc, char **argv)
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;
 		particleFilter.lowVarianceResample(worldMap);
-		#ifdef DEBUG
+		/* particleFilter.resample(); */
+		if (visualizeMapFlag)
 			visualizeMap(worldMap, particleFilter.particles, "Particles Visualization", 50);
-		#endif
 	}
 	return 0;
 }

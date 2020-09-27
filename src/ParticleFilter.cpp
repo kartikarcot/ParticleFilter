@@ -18,7 +18,8 @@ ParticleFilter::ParticleFilter(
 					const size_t _numParticles, 
 					const std::shared_ptr<Map> &mp,
 					const double &_posVar,
-					const double &_thetaVar) : 
+					const double &_thetaVar,
+					const int &seed) : 
 						numParticles(_numParticles),
 						weights(std::vector<double>(_numParticles, 1/double(_numParticles))),
 						posVar(_posVar),
@@ -26,7 +27,7 @@ ParticleFilter::ParticleFilter(
 {
     
     std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
-    
+    std::default_random_engine generator(seed);
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);
     while(numGenerated < numParticles)
@@ -59,9 +60,9 @@ void ParticleFilter::resample()
 	/* 	std::cout<<w<<" "; */
 	/* } */
 	/* std::cout<<std::endl; */
-
-	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
-	std::random_device rd;
+	normalizeAndShiftWeights(weights);
+	// std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
+	// std::random_device rd;
 	std::default_random_engine generator(SEED);
     // normalize_weights(weights);
     std::discrete_distribution<int> distribution(weights.begin(), weights.end());
@@ -69,24 +70,24 @@ void ParticleFilter::resample()
 	for (auto &newParticle : newParticles)
 	{
 		newParticle = particles[distribution(generator)];
-		newParticle.x += x_noise(generator);
-		newParticle.y += y_noise(generator);
-		newParticle.theta += theta_noise(generator);
+		// newParticle.x += x_noise(generator);
+		// newParticle.y += y_noise(generator);
+		// newParticle.theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
 	return;
 }
 
-void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp)
+void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const int &seed)
 {
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
-	std::default_random_engine generator(SEED);
+	std::default_random_engine generator(seed);
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 	std::vector<Pose2D> newParticles(numParticles);
-	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
+	// std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
 	normalizeAndShiftWeights(weights);
@@ -103,14 +104,14 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp)
 		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
-		auto newX = newParticles[i].x + x_noise(generator);
-		auto newY = newParticles[i].y + y_noise(generator);
+		auto newX = newParticles[i].x;// + x_noise(generator);
+		auto newY = newParticles[i].y;// + y_noise(generator);
 		if(isFreespace(newX,newY,mp))
 		{
 			newParticles[i].x = newX;
 			newParticles[i].y = newY;
 		}
-		newParticles[i].theta += theta_noise(generator);
+		// newParticles[i].theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
 	return;

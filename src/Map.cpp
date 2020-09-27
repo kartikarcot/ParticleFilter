@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-
+#include "ParticleFilter.hpp"
 
 
 // @TODO: 
@@ -224,6 +224,49 @@ void visualizeMap(
 			2,
 			cv::Scalar(0,255,0),
 			-1); 
+
+	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
+	cv::imshow(message, mat);
+	cv::waitKey(timeout);
+}
+
+void visualizeMapWithArrows(const ParticleFilter& pf,
+							const std::shared_ptr<Map> &map,
+							const std::string &message,
+							const int &timeout)
+{
+	auto iter = std::max_element(pf.weights.begin(), pf.weights.end());
+	int maxIdx = std::distance(pf.weights.begin(), iter);
+	cv::Mat mat;
+	mat.create(map->data.size(), map->data[0].size(), CV_64FC3);
+
+	for (int i = 0; i < map->data.size(); i++)
+	{
+		for (int j = 0; j < map->data[i].size(); j++)
+		{
+			double grayCode = map->data[i][j];
+			// color don't know cells as occupied
+			if (grayCode == -1) grayCode = 1.0;
+			mat.at<cv::Vec3d>(i,j) = cv::Vec3d(grayCode, grayCode, grayCode);
+		}
+	}
+	
+	for (const auto &particlePose : pf.particles)
+	{
+		cv::circle(mat, 
+				cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
+				1, cv::Scalar(0,0,255), -1); 
+	}
+
+	// draw an arrow for the best weighted particle
+	Pose2D bestWeightedParticlePose = pf.particles[maxIdx];
+	Pose2D bestWeightedParticlePoseExtend = bestWeightedParticlePose;
+	double arrowLength = 5;
+	bestWeightedParticlePoseExtend.x += arrowLength*cos(bestWeightedParticlePose.theta); 
+	bestWeightedParticlePoseExtend.y += arrowLength*sin(bestWeightedParticlePose.theta); 
+	cv::Point2d start(bestWeightedParticlePose.y/map->resolution, bestWeightedParticlePose.x/map->resolution);
+	cv::Point2d end(bestWeightedParticlePoseExtend.y/map->resolution, bestWeightedParticlePoseExtend.x/map->resolution);
+	cv::arrowedLine(mat, start, end, CV_RGB(0, 255, 0), 1, 8, 0, 0.1);
 
 	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
 	cv::imshow(message, mat);

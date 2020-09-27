@@ -49,9 +49,9 @@ std::vector<int> SensorModel::rayCasting(
 	double deltaY = laserPoseInOdomFrame.y - robotPoseInOdomFrame.y;
 	double deltaTheta = laserPoseInOdomFrame.theta - robotPoseInOdomFrame.theta;
 	Pose2D laserPoseInWorldFrame(
-			particlePoseInWorldFrame.x + deltaX,
-			particlePoseInWorldFrame.y + deltaY,
-			particlePoseInWorldFrame.theta + deltaTheta);
+			particlePoseInWorldFrame.x + 25*cos(particlePoseInWorldFrame.theta),
+			particlePoseInWorldFrame.y + 25*sin(particlePoseInWorldFrame.theta),
+			particlePoseInWorldFrame.theta);
 
 	// perform ray casting from the laserPoseInWorldFrame
 	std::vector<int> simulatedRayCast(180/rayskipfactor,laserMaxRange);
@@ -133,7 +133,7 @@ std::vector<double> SensorModel::testingData(double z_star)
 inline double SensorModel::pHit(const double &z, const double &zStar)
 {
 	
-	return z >= laserMinRange && z < laserMaxRange ?  1/(zHitVar*SQRT_2PI) * 
+	return z >= laserMinRange && z < laserMaxRange ?  1/(sqrt(zHitVar)*SQRT_2PI) * 
 											exp( -0.5 * pow((z - zStar)/zHitVar , 2)) : 0;	
 }
 
