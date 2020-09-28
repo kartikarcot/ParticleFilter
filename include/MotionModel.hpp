@@ -35,7 +35,7 @@ class MotionModel
 {
     std::vector<double> alphas;
     OdomModelNoise processNoise;
-	double rot1, trans, rot2;
+	double deltaRot1, deltaTrans, deltaRot2;
     std::mt19937_64 tgenerator, rgenerator;
     public:
     MotionModel(

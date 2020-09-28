@@ -15,18 +15,18 @@ MotionModel::MotionModel(
     double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
 	deltaX = robotPoseinOdomFrameCurrent.x-robotPoseinOdomFramePrev.x;
 
-	rot1 = deltaY > MINCHANGE && deltaX > MINCHANGE? 
+	deltaRot1 = deltaY > MINCHANGE && deltaX > MINCHANGE? 
 		atan2( deltaY,deltaX) - robotPoseinOdomFramePrev.theta : 0;
 
-	trans = sqrt(
+	deltaTrans = sqrt(
 			pow(deltaY,2.0) + 
 			pow(deltaX,2.0));
 
-	rot2 = robotPoseinOdomFrameCurrent.theta - rot1 - robotPoseinOdomFramePrev.theta;
+	deltaRot2 = robotPoseinOdomFrameCurrent.theta - deltaRot1 - robotPoseinOdomFramePrev.theta;
 
 	//Conceptual doubt : to add or subtract
 	std::random_device rd;
-	double rot1Var = alphas[0]*rot1+alphas[1]*trans, transVar = alphas[2]*trans+alphas[3]*(rot1+rot2),rot2Var = alphas[0]*rot2 + alphas[1]*trans;
+	double rot1Var = alphas[0]*pow(deltaRot1,2)+alphas[1]*pow(deltaTrans,2), transVar = alphas[2]*pow(deltaTrans,2)+alphas[3]*(pow(deltaRot1,2)+pow(deltaRot2,2)),rot2Var = alphas[0]*pow(deltaRot2,2) + alphas[1]*pow(deltaTrans,2);
 
 	processNoise = OdomModelNoise(sqrt(rot1Var),sqrt(transVar),sqrt(rot2Var));
 
