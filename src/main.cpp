@@ -58,8 +58,7 @@ int main(int argc, char **argv)
 							cfg->get<double>("alpha4")
 						};
 
-	MotionModel motionModel(alphas,
-							cfg->get<int>("seed"));
+	int seed = cfg->get<int>("seed");
 
 	SensorModel sensorModel(
 			cfg->get<double>("zHit"),
@@ -97,6 +96,8 @@ int main(int argc, char **argv)
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
 
+		MotionModel motionModel(alphas, seed, odomPreviousMeasure, odomCurrentMeasure);
+
 		#pragma omp parallel for
 		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
 		{
@@ -106,8 +107,6 @@ int main(int argc, char **argv)
 			{
 				motionModel.predictOdometryModel(
 								particleFilter.particles[i], 
-								odomPreviousMeasure, 
-								odomCurrentMeasure, 
 								worldMap, 
 								false);
 					/* particleFilter.weights[i] = 0; */
@@ -116,7 +115,7 @@ int main(int argc, char **argv)
 			if (log->logType == LogType::LASER)
 			{
 				/* if(particleFilter.weights[i]!=0) */
-					particleFilter.weights[i] += sensorModel.beamRangeFinderModel(
+					particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
 											log->laserPose,
 											odomCurrentMeasure,
 											particleFilter.particles[i],

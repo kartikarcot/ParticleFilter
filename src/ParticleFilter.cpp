@@ -27,7 +27,7 @@ ParticleFilter::ParticleFilter(
 {
     
     std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
-    std::default_random_engine generator(seed);
+    std::mt19937_64 generator(seed);
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);
     while(numGenerated < numParticles)
@@ -83,7 +83,7 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
-	std::default_random_engine generator(seed);
+	std::mt19937_64 generator(rd());
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 	std::vector<Pose2D> newParticles(numParticles);

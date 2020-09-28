@@ -102,6 +102,7 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 											worldMap);
 	
 	double logProb = 0;
+	
 	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=rayskipfactor)
 	{
 		double realMeas = (double)realLaserData[i], simMeas = (double)simulatedLaserData[j++];
@@ -111,9 +112,8 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 								+ zRand * pRand(realMeas));
 								
 	}
-	/* SPDLOG_DEBUG("The logProb value is {}", logProb); */
+
 	return (logProb);
-	
 }
 
 std::vector<double> SensorModel::testingData(double z_star)
@@ -133,7 +133,7 @@ std::vector<double> SensorModel::testingData(double z_star)
 inline double SensorModel::pHit(const double &z, const double &zStar)
 {
 	
-	return z >= laserMinRange && z < laserMaxRange ?  1/(sqrt(zHitVar)*SQRT_2PI) * 
+	return z >= laserMinRange && z < laserMaxRange ?  1/(zHitVar*SQRT_2PI) * 
 											exp( -0.5 * pow((z - zStar)/zHitVar , 2)) : 0;	
 }
 

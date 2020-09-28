@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 							cfg->get<double>("alpha4")
 						};
 
-	MotionModel motionModel(alphas);
+	int seed = cfg->get<int>("seed");
 	double posX = stod(std::string(argv[4])); //3400
 	double posY = stod(std::string(argv[5])); //4250
 	double theta = stod(std::string(argv[6])); //-300/180
@@ -82,7 +82,8 @@ int main(int argc, char **argv)
 
 		// set current odom measure to odom robot pose read from log
 		odomCurrentMeasure = log->robotPose;
-		motionModel.predictOdometryModel(particleFilter.particles[0], odomPreviousMeasure, odomCurrentMeasure, worldMap, true);
+		MotionModel motionModel(alphas, seed, odomPreviousMeasure, odomCurrentMeasure);
+		motionModel.predictOdometryModel(particleFilter.particles[0],  worldMap, true);
 		trajectory.push_back(particleFilter.particles[0]);
 		
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration

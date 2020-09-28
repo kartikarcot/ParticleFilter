@@ -35,13 +35,17 @@ class MotionModel
 {
     std::vector<double> alphas;
     OdomModelNoise processNoise;
+	double rot1, trans, rot2;
+    std::mt19937_64 tgenerator, rgenerator;
     public:
-    MotionModel(std::vector<double> alphas, const int &seed = 1);
-    std::default_random_engine generator;
+    MotionModel(
+			std::vector<double> alphas, 
+			const int &seed,
+			const Pose2D& robotPoseinOdomFramePrev, 
+			const Pose2D& robotPoseinOdomFrameCurrent);
+
 	bool predictOdometryModel(
 			Pose2D& p, 
-			const Pose2D& odomPreviousMeasure, 
-			const Pose2D& odomCurrentMeasure, 
 			const std::shared_ptr<Map> &mp, 
 			bool ignoreObstacles);
 
