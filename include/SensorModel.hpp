@@ -28,8 +28,7 @@ class SensorModel
 			int rayskipfactor,
 			bool visualizeRays);
 		
-	double beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
-						const Pose2D &robotPoseInOdomFrame,
+	double beamRangeFinderModel(
 						Pose2D& particlePoseInWorldFrame, 
 						std::vector<int>& realLaserData,
 						const std::shared_ptr<Map> &worldMap);
@@ -37,8 +36,6 @@ class SensorModel
 	std::vector<double> testingData(double z_star);
 
 	std::vector<int> rayCasting(
-							const Pose2D &laserPoseInOdomFrame, 
-							const Pose2D &robotPoseInOdomFrame,
 							const Pose2D &particlePoseInWorldFrame, 
 							const std::shared_ptr<Map> &map);
 

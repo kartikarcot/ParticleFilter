@@ -116,8 +116,6 @@ int main(int argc, char **argv)
 			{
 				/* if(particleFilter.weights[i]!=0) */
 					particleFilter.weights[i] = sensorModel.beamRangeFinderModel(
-											log->laserPose,
-											odomCurrentMeasure,
 											particleFilter.particles[i],
 											log->laserdata,
 											worldMap);

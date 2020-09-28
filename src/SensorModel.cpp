@@ -39,15 +39,10 @@ SensorModel::SensorModel(double _zHit,
 {}
 
 std::vector<int> SensorModel::rayCasting(
-					const Pose2D &laserPoseInOdomFrame,
-					const Pose2D &robotPoseInOdomFrame,
 					const Pose2D &particlePoseInWorldFrame,
 					const std::shared_ptr<Map> &worldMap)
 {
 	// get the laser pose in world frame for the particle belief
-	double deltaX = laserPoseInOdomFrame.x - robotPoseInOdomFrame.x;
-	double deltaY = laserPoseInOdomFrame.y - robotPoseInOdomFrame.y;
-	double deltaTheta = laserPoseInOdomFrame.theta - robotPoseInOdomFrame.theta;
 	Pose2D laserPoseInWorldFrame(
 			particlePoseInWorldFrame.x + 25*cos(particlePoseInWorldFrame.theta),
 			particlePoseInWorldFrame.y + 25*sin(particlePoseInWorldFrame.theta),
@@ -90,16 +85,12 @@ std::vector<int> SensorModel::rayCasting(
 }
 
 
-double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
-							const Pose2D &robotPoseInOdomFrame,
+double SensorModel::beamRangeFinderModel(
 							Pose2D& particlePoseInWorldFrame, 
 							std::vector<int>& realLaserData,
 							const std::shared_ptr<Map> &worldMap)
 {
-	std::vector<int> simulatedLaserData = rayCasting(laserPoseInOdomFrame,
-											robotPoseInOdomFrame,
-											particlePoseInWorldFrame,
-											worldMap);
+	std::vector<int> simulatedLaserData = rayCasting(particlePoseInWorldFrame, worldMap);
 	
 	double logProb = 0;
 	
@@ -112,7 +103,7 @@ double SensorModel::beamRangeFinderModel(const Pose2D &laserPoseInOdomFrame,
 								+ zRand * pRand(realMeas));
 								
 	}
-
+	/* SPDLOG_DEBUG("The logprob is {} for pose ({},{})", logProb, particlePoseInWorldFrame.x, particlePoseInWorldFrame.y); */
 	return (logProb);
 }
 

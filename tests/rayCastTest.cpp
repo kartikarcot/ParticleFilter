@@ -94,8 +94,6 @@ int main(int argc, char **argv)
 			if (log->logType == LogType::LASER)
 			{
 				auto values = sensorModel.rayCasting(
-											log->laserPose,
-											odomCurrentMeasure,
 											particleFilter.particles[i],
 											worldMap);
 				for (int i = 0; i < values.size(); i++)
