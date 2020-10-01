@@ -1,5 +1,7 @@
 #include <MotionModel.hpp>
 #include <Utils.hpp>
+#include <cmath>
+
 
 MotionModel::MotionModel(
 						std::vector<double> _alphas, 
@@ -17,12 +19,16 @@ MotionModel::MotionModel(
 
 	deltaRot1 = deltaY > MINCHANGE && deltaX > MINCHANGE? 
 		atan2( deltaY,deltaX) - robotPoseinOdomFramePrev.theta : 0;
+	
+	deltaRot1 = std::fmod(deltaRot1, 2*PI);
 
 	deltaTrans = sqrt(
 			pow(deltaY,2.0) + 
 			pow(deltaX,2.0));
 
 	deltaRot2 = robotPoseinOdomFrameCurrent.theta - deltaRot1 - robotPoseinOdomFramePrev.theta;
+
+	deltaRot2 = std::fmod(deltaRot2, 2*PI);
 
 	//Conceptual doubt : to add or subtract
 	std::random_device rd;
@@ -38,9 +44,9 @@ bool MotionModel::predictOdometryModel(
 {
 
         
-    double rot1Bar = rot1 - processNoise.dists[0](rgenerator);
-    double transBar = trans - processNoise.dists[1](tgenerator);
-    double rot2Bar = rot2 - processNoise.dists[2](rgenerator);
+    double rot1Bar = deltaRot1 - processNoise.dists[0](rgenerator);
+    double transBar = deltaTrans - processNoise.dists[1](tgenerator);
+    double rot2Bar = deltaRot2 - processNoise.dists[2](rgenerator);
 
 	/* SPDLOG_DEBUG("The ut0 pose is {} {} {}", odomPreviousMeasure.x, odomPreviousMeasure.y, odomPreviousMeasure.theta); */
 	/* SPDLOG_DEBUG("The ut1 pose is {} {} {}", odomCurrentMeasure.x, odomCurrentMeasure.y, odomCurrentMeasure.theta); */
@@ -54,6 +60,10 @@ bool MotionModel::predictOdometryModel(
         particlePose.x = newX;
         particlePose.y = newY;
         particlePose.theta += rot1Bar + rot2Bar;
+		if (particlePose.theta > PI)
+		{
+			particlePose.theta = std::fmod(particlePose.theta, 2*PI);
+		}
         return true;
     }
     else return false;

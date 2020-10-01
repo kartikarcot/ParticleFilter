@@ -32,6 +32,8 @@ int main(int argc, char **argv)
 		return 1; 
 	}
 
+    cv::VideoWriter video("pf_log.avi",CV_FOURCC('M','J','P','G'),10, cv::Size(800,800));
+
 	Config::initializeConfig(std::string(argv[3]));
 	std::shared_ptr<Config> cfg = Config::getInstance();
 	bool visualizeMapFlag = cfg->get<bool>("visualizeMap");
@@ -123,11 +125,15 @@ int main(int argc, char **argv)
 		}
 
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
-		odomPreviousMeasure = odomCurrentMeasure;
-		particleFilter.lowVarianceResample(worldMap);
-		/* particleFilter.resample(); */
+		odomPreviousMeasure = odomCurrentMeasure;	
+
+		if (log->logType == LogType::LASER)
+			particleFilter.lowVarianceResample(worldMap);
+
 		if (visualizeMapFlag)
-			visualizeMap(worldMap, particleFilter.particles, "Particles Visualization", 50);
+			visualizeMapWithArrows(particleFilter, worldMap, "Particles Visualization", 50, video);
+		
 	}
+	video.release();
 	return 0;
 }

@@ -83,10 +83,10 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
-	std::mt19937_64 generator(rd());
+	std::mt19937_64 generator(seed);
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
-	std::vector<Pose2D> newParticles(numParticles);
+
 	// std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
@@ -96,8 +96,13 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	for (int i = 1; i < numParticles; i++)
 		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
 
+	if (numParticles > 500)
+		numParticles -= 100;
+
+	int newParticlesSize = numParticles > 1000? numParticles - 100 : numParticles;
+	std::vector<Pose2D> newParticles(newParticlesSize);
 	// sample values and get indices
-	for (int i = 0; i < numParticles; i++)
+	for (int i = 0; i < newParticlesSize; i++)
 	{
 		curVal = startVal + i * (stepSize);
 		auto upperBoundIter = std::upper_bound(cumulativeWeights.begin(), cumulativeWeights.end(), curVal);
@@ -114,6 +119,8 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		// newParticles[i].theta += theta_noise(generator);
 	}
 	particles = std::move(newParticles);
+	weights.resize(newParticlesSize);
+	numParticles = newParticlesSize;
 	return;
 }
 

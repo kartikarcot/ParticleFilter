@@ -78,6 +78,7 @@ void visualizeMap(
 void visualizeMapWithArrows(const ParticleFilter& pf,
 							const std::shared_ptr<Map> &map,
 							const std::string &message,
-							const int &timeout);
+							const int &timeout,
+							cv::VideoWriter video);
 
 #endif

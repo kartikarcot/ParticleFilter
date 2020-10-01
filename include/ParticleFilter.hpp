@@ -28,7 +28,7 @@ class ParticleFilter
 {
 public:
     
-    const size_t numParticles;
+    size_t numParticles;
 
     std::vector<Pose2D> particles;
 
