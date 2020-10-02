@@ -4,19 +4,20 @@
 void normalizeAndShiftWeights(std::vector<double>& weights)
 {
     double sum = 0 ;
-	double minValue = *(std::min_element(weights.begin(), weights.end()));
+    double minValue = *(std::min_element(weights.begin(), weights.end()));
 
-	/* for (int i = 0; i < weights.size(); i++) */
-	/* { */
-	/* 	weights[i]-=(minValue-1e-6); */
-	/* } */
+    /* for (int i = 0; i < weights.size(); i++) */
+    /* { */
+    /*     weights[i]-=(minValue-1e-6); */
+    /* } */
 
     // for(auto &weight:weights)
     //     sum+=weight;
 
     for (auto &weight : weights)
     {
-        weight = exp((weight));
+        // weight = exp(weight/5);
+        weight = exp(weight - 7.5);
         sum += weight;
     }
 

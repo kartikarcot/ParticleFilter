@@ -93,7 +93,7 @@ double SensorModel::beamRangeFinderModel(
 	std::vector<int> simulatedLaserData = rayCasting(particlePoseInWorldFrame, worldMap);
 	
 	double logProb = 0;
-	
+
 	for (int i = 0, j = 0 ; i< realLaserData.size() ; i+=rayskipfactor)
 	{
 		double realMeas = (double)realLaserData[i], simMeas = (double)simulatedLaserData[j++];

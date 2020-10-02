@@ -27,6 +27,7 @@ ParticleFilter::ParticleFilter(
 {
     
     std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
+    std::random_device rd;
     std::mt19937_64 generator(seed);
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);
@@ -83,7 +84,7 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
-	std::mt19937_64 generator(seed);
+	std::mt19937_64 generator(rd());
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 
@@ -91,15 +92,15 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 
 	// normalize the weights
 	normalizeAndShiftWeights(weights);
+	auto maxIter = std::max_element(weights.begin(), weights.end());
+	auto minIter = std::min_element(weights.begin(), weights.end());
+	SPDLOG_DEBUG("The max/min ratio of normalized weights is {}", (*maxIter)/(*minIter));
 	// calculate the cumulativeWeightvector
 	cumulativeWeights[0] = weights[0];
 	for (int i = 1; i < numParticles; i++)
 		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
 
-	if (numParticles > 500)
-		numParticles -= 100;
-
-	int newParticlesSize = numParticles > 1000? numParticles - 100 : numParticles;
+	int newParticlesSize = numParticles;// > 1000? numParticles - 50 : numParticles;
 	std::vector<Pose2D> newParticles(newParticlesSize);
 	// sample values and get indices
 	for (int i = 0; i < newParticlesSize; i++)
@@ -129,11 +130,10 @@ void ParticleFilter::lowVarianceResampleTest(const std::shared_ptr<Map> &mp)
 	std::vector<double> cumulativeWeights(numParticles);
 	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
-	std::default_random_engine generator(rd());
+	std::mt19937_64 generator(rd());
 	std::uniform_real_distribution<> distribution(0, stepSize);
 	double startVal = distribution(generator), curVal = 0;
 	std::vector<Pose2D> newParticles(numParticles);
-	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
 	normalizeAndShiftWeights(weights);
@@ -153,17 +153,13 @@ void ParticleFilter::lowVarianceResampleTest(const std::shared_ptr<Map> &mp)
 		
 		newParticles[i] = particles[index];
 		
-		
-		newParticles[i].theta += theta_noise(generator);
-		auto newX = newParticles[i].x + x_noise(generator);
-		auto newY = newParticles[i].y + y_noise(generator);
+		auto newX = newParticles[i].x;//+ x_noise(generator);
+		auto newY = newParticles[i].y;// + y_noise(generator);
 		if(isFreespace(newX,newY,mp))
 		{
 			newParticles[i].x = newX;
 			newParticles[i].y = newY;
 		}
-		
-		
 	}
 
 	for (const auto &it : countMap)

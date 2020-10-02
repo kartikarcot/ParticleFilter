@@ -39,7 +39,7 @@ class MotionModel
     std::mt19937_64 tgenerator, rgenerator;
     public:
     MotionModel(
-			std::vector<double> alphas, 
+			const std::vector<double> &alphas, 
 			const int &seed,
 			const Pose2D& robotPoseinOdomFramePrev, 
 			const Pose2D& robotPoseinOdomFrameCurrent);

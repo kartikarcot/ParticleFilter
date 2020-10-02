@@ -252,23 +252,51 @@ void visualizeMapWithArrows(const ParticleFilter& pf,
 	}
     cv::cvtColor(mat1Channel, mat, cv::COLOR_GRAY2BGR);
 
-	for (const auto &particlePose : pf.particles)
+	std::vector<std::pair<Pose2D, double>> particleWeightPair(pf.numParticles);
+	for (int i = 0; i < pf.numParticles; i++)
 	{
-		double arrowLength = 100;
-		const Pose2D &bestWeightedParticlePose = particlePose;
-		Pose2D bestWeightedParticlePoseExtend = bestWeightedParticlePose;
-		bestWeightedParticlePoseExtend.x += arrowLength*cos(particlePose.theta); 
-		bestWeightedParticlePoseExtend.y += arrowLength*sin(particlePose.theta); 
-		cv::Point2d start(bestWeightedParticlePose.y/map->resolution, bestWeightedParticlePose.x/map->resolution);
-		cv::Point2d end(bestWeightedParticlePoseExtend.y/map->resolution, bestWeightedParticlePoseExtend.x/map->resolution);
-		cv::arrowedLine(mat, start, end, CV_RGB(0, 255, 0), 1, 8, 0, 0.2);
-		cv::circle(mat, 
-				cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
-				1, cv::Scalar(0,0,255), -1); 
+		particleWeightPair[i] = std::make_pair(pf.particles[i], pf.weights[i]);
+	}
+	std::sort(particleWeightPair.begin(), particleWeightPair.end(),
+				[] (const auto &a, const auto &b) {return a.second < b.second;});
+
+	int i = 0;
+	for (const auto &particleWeightPair : particleWeightPair)
+	{
+		auto &particlePose = particleWeightPair.first;
+		if ((i == 0) || (i == pf.numParticles-1))
+		{
+			double arrowLength = 100;
+			const Pose2D &bestWeightedParticlePose = particlePose;
+			Pose2D bestWeightedParticlePoseExtend = bestWeightedParticlePose;
+			bestWeightedParticlePoseExtend.x += arrowLength*cos(particlePose.theta); 
+			bestWeightedParticlePoseExtend.y += arrowLength*sin(particlePose.theta); 
+			cv::Point2d start(bestWeightedParticlePose.y/map->resolution, bestWeightedParticlePose.x/map->resolution);
+			cv::Point2d end(bestWeightedParticlePoseExtend.y/map->resolution, bestWeightedParticlePoseExtend.x/map->resolution);
+			cv::arrowedLine(mat, start, end, CV_RGB(255, 255, 0), 1, 8, 0, 0.2);
+		}
+		if (i < 100)
+		{
+			cv::circle(mat, 
+					cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
+					1, cv::Scalar(0,0,255), -1); 
+		}
+		else if (i > pf.numParticles - 100)
+		{
+			cv::circle(mat, 
+					cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
+					1, cv::Scalar(0,255,0), -1); 
+		}
+		else
+		{
+			cv::circle(mat, 
+					cv::Point2d(particlePose.y/map->resolution, particlePose.x/map->resolution), 
+					1, cv::Scalar(255,0,0), -1); 
+		}
+        i++;
 	}
 
 	// draw an arrow for the best weighted particle
-		
 	cv::namedWindow(message, cv::WINDOW_AUTOSIZE);
     video.write(mat);
 	cv::imshow(message, mat);

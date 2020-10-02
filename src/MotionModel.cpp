@@ -4,17 +4,17 @@
 
 
 MotionModel::MotionModel(
-						std::vector<double> _alphas, 
+						const std::vector<double> &_alphas, 
 						const int& seed,
 						const Pose2D& robotPoseinOdomFramePrev, 
 						const Pose2D& robotPoseinOdomFrameCurrent) : 
 						alphas(_alphas), 
-						tgenerator(std::mt19937_64(seed)),
-						rgenerator(std::mt19937_64(seed)),
+						tgenerator(std::mt19937_64(std::random_device()())),
+						rgenerator(std::mt19937_64(std::random_device()())),
 						processNoise(0.001,0.01,0.001)
 {
 
-    double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
+	double deltaY = robotPoseinOdomFrameCurrent.y-robotPoseinOdomFramePrev.y ,
 	deltaX = robotPoseinOdomFrameCurrent.x-robotPoseinOdomFramePrev.x;
 
 	deltaRot1 = deltaY > MINCHANGE && deltaX > MINCHANGE? 
@@ -30,11 +30,11 @@ MotionModel::MotionModel(
 
 	deltaRot2 = std::fmod(deltaRot2, 2*PI);
 
-	//Conceptual doubt : to add or subtract
-	std::random_device rd;
-	double rot1Var = alphas[0]*pow(deltaRot1,2)+alphas[1]*pow(deltaTrans,2), transVar = alphas[2]*pow(deltaTrans,2)+alphas[3]*(pow(deltaRot1,2)+pow(deltaRot2,2)),rot2Var = alphas[0]*pow(deltaRot2,2) + alphas[1]*pow(deltaTrans,2);
+	double rot1Var = alphas[0]*pow(deltaRot1,2)+alphas[1]*pow(deltaTrans,2);
+	double transVar = alphas[2]*pow(deltaTrans,2)+alphas[3]*(pow(deltaRot1,2)+pow(deltaRot2,2));
+	double rot2Var = alphas[0]*pow(deltaRot2,2) + alphas[1]*pow(deltaTrans,2);
 
-	processNoise = OdomModelNoise(sqrt(rot1Var),sqrt(transVar),sqrt(rot2Var));
+	processNoise = OdomModelNoise((rot1Var),(transVar),(rot2Var));
 
 }
 
@@ -43,7 +43,6 @@ bool MotionModel::predictOdometryModel(
 		const std::shared_ptr<Map> &mp, bool ignoreObstacles)
 {
 
-        
     double rot1Bar = deltaRot1 - processNoise.dists[0](rgenerator);
     double transBar = deltaTrans - processNoise.dists[1](tgenerator);
     double rot2Bar = deltaRot2 - processNoise.dists[2](rgenerator);
@@ -60,11 +59,8 @@ bool MotionModel::predictOdometryModel(
         particlePose.x = newX;
         particlePose.y = newY;
         particlePose.theta += rot1Bar + rot2Bar;
-		if (particlePose.theta > PI)
-		{
-			particlePose.theta = std::fmod(particlePose.theta, 2*PI);
-		}
+		particlePose.theta = std::fmod(particlePose.theta, 2*PI);
         return true;
     }
-    else return false;
+    return false;
 }

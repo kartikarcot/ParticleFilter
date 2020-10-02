@@ -48,7 +48,8 @@ int main(int argc, char **argv)
 									cfg->get<double>("posvar"),
 									cfg->get<double>("thetavar"));
 
-	particleFilter.particles[0] = Pose2D(8000-4000,4140, -PI/2 - 10*PI/180);
+	/* particleFilter.particles[0] = Pose2D(8000-4000,4140, -PI/2 - 10*PI/180); */
+	particleFilter.particles[0] = Pose2D(3000,4000, -PI);
 	// particleFilter.particles[0] = Pose2D(0,0, 0);
 	/* particleFilter.particles[0] = Pose2D(8000-7100,4400, -PI/2); */
 	SensorModel sensorModel(
@@ -96,6 +97,10 @@ int main(int argc, char **argv)
 				auto values = sensorModel.rayCasting(
 											particleFilter.particles[i],
 											worldMap);
+				
+				SPDLOG_DEBUG("The logprob values here are {}", 
+					sensorModel.beamRangeFinderModel(particleFilter.particles[i], log->laserdata, worldMap));
+
 				for (int i = 0; i < values.size(); i++)
 				{
 					fsm<<values[i]<<" "<<log->laserdata[i]<<std::endl;

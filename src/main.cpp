@@ -53,6 +53,10 @@ int main(int argc, char **argv)
 									cfg->get<double>("thetavar"),
 									cfg->get<int>("seed"));
 
+    // for (int i = 0; i < 5000; i++)
+    // {
+    //     particleFilter.particles[i] = Pose2D(8000-4000,4140, -PI/2 - 10*PI/180);
+    // }
 	std::vector<double> alphas = {
 							cfg->get<double>("alpha1"),
 							cfg->get<double>("alpha2"),
@@ -127,11 +131,14 @@ int main(int argc, char **argv)
 		//set odomPreviousMeasure to odomCurrentMeasure for next iteration
 		odomPreviousMeasure = odomCurrentMeasure;	
 
+		if (visualizeMapFlag)
+			visualizeMapWithArrows(particleFilter, worldMap, "Particles Visualization Before Resampling", 50, video);
+
 		if (log->logType == LogType::LASER)
 			particleFilter.lowVarianceResample(worldMap);
 
-		if (visualizeMapFlag)
-			visualizeMapWithArrows(particleFilter, worldMap, "Particles Visualization", 50, video);
+		/* if (visualizeMapFlag) */
+		/* 	visualizeMapWithArrows(particleFilter, worldMap, "Particles Visualization", 50, video); */
 		
 	}
 	video.release();
