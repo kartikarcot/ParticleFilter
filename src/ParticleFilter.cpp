@@ -79,18 +79,27 @@ void ParticleFilter::resample()
 	return;
 }
 
+void ParticleFilter::updateMovingAverage()
+{
+	double curBelief = 0;
+	for (const auto & weight : weights)
+	{
+		curBelief += weight;
+	}
+	movingAverageOfBelief = movingAverageOfBelief + (curBelief/numParticles - movingAverageOfBelief)/windowSize;
+	SPDLOG_DEBUG("The moving average value and cursum is {}, {}", movingAverageOfBelief, curBelief/numParticles);
+}
+
 void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const int &seed)
 {
 	std::vector<double> cumulativeWeights(numParticles);
-	double stepSize = ((double)1/numParticles);
 	std::random_device rd;
 	std::mt19937_64 generator(rd());
-	std::uniform_real_distribution<> distribution(0, stepSize);
-	double startVal = distribution(generator), curVal = 0;
 
-	// std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
+	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
+	updateMovingAverage();
 	normalizeAndShiftWeights(weights);
 	auto maxIter = std::max_element(weights.begin(), weights.end());
 	auto minIter = std::min_element(weights.begin(), weights.end());
@@ -100,8 +109,30 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	for (int i = 1; i < numParticles; i++)
 		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
 
-	int newParticlesSize = numParticles;// > 1000? numParticles - 50 : numParticles;
+	int newParticlesSize = numParticles;
+	if (movingAverageOfBelief < -26.5 && count == 0)
+	{ 
+		SPDLOG_DEBUG("Filter uncertain, increase number of particles");
+		newParticlesSize = 10000;
+		count = 10;
+	}
+	else if (count == 0)
+	{
+		SPDLOG_DEBUG("Filter certain, decrease number of particles");
+		newParticlesSize = 5000;
+		count = 10;
+	}
+	count--;
+
+	if (noiseCount > 0)
+		noiseCount--;
+
+	// set stepsize based on new length
+	double stepSize = ((double)1/newParticlesSize);
+	std::uniform_real_distribution<> distribution(0, stepSize);
 	std::vector<Pose2D> newParticles(newParticlesSize);
+	double startVal = distribution(generator), curVal = 0;
+
 	// sample values and get indices
 	for (int i = 0; i < newParticlesSize; i++)
 	{
@@ -110,12 +141,20 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		int index = std::max((long)0, std::distance(cumulativeWeights.begin(), upperBoundIter));
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
-		auto newX = newParticles[i].x;// + x_noise(generator);
-		auto newY = newParticles[i].y;// + y_noise(generator);
+		double newX, newY, newTheta;
+		if (movingAverageOfBelief < -28.5 && noiseCount == 0)
+		{
+			newX = newParticles[i].x + x_noise(generator);
+			newY = newParticles[i].y + y_noise(generator);
+			newTheta = newParticles[i].theta + theta_noise(generator);
+			noiseCount = 10;
+		}
+		
 		if(isFreespace(newX,newY,mp))
 		{
 			newParticles[i].x = newX;
 			newParticles[i].y = newY;
+			newParticles[i].theta = newTheta;
 		}
 		// newParticles[i].theta += theta_noise(generator);
 	}

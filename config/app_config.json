@@ -18,6 +18,6 @@
 	"maxrange":8000,
 	"visualizeRays":false,
 	"visualizeMap":true,
-	"posvar":0.1,
-	"thetavar":0.05
+	"posvar":10,
+	"thetavar":0.02
 }
