@@ -111,11 +111,11 @@ int main(int argc, char **argv)
 			// Motion Model update
 			#pragma omp critical
 			{
-				motionModel.predictOdometryModel(
+				if(!motionModel.predictOdometryModel(
 								particleFilter.particles[i], 
 								worldMap, 
-								false);
-					/* particleFilter.weights[i] = 0; */
+								false))
+					particleFilter.weights[i] = -100;
 			}
 			// Sensor Model update
 			if (log->logType == LogType::LASER)

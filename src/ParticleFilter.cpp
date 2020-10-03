@@ -123,9 +123,12 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		count = 10;
 	}
 	count--;
-
-	if (noiseCount > 0)
-		noiseCount--;
+	
+	if (movingAverageOfBelief < -28.5 && noiseCount >= 10)
+	{
+		SPDLOG_DEBUG("Reinitializing Noise Count");
+		noiseCount = 0;
+	}
 
 	// set stepsize based on new length
 	double stepSize = ((double)1/newParticlesSize);
@@ -142,22 +145,27 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
 		double newX, newY, newTheta;
-		if (movingAverageOfBelief < -28.5 && noiseCount == 0)
+		if (noiseCount < 10)
 		{
 			newX = newParticles[i].x + x_noise(generator);
 			newY = newParticles[i].y + y_noise(generator);
 			newTheta = newParticles[i].theta + theta_noise(generator);
-			noiseCount = 10;
-		}
-		
-		if(isFreespace(newX,newY,mp))
-		{
-			newParticles[i].x = newX;
-			newParticles[i].y = newY;
-			newParticles[i].theta = newTheta;
+            if(isFreespace(newX,newY,mp))
+            {
+                newParticles[i].x = newX;
+                newParticles[i].y = newY;
+                newParticles[i].theta = newTheta;
+            }
 		}
 		// newParticles[i].theta += theta_noise(generator);
 	}
+
+	if (noiseCount < 10)
+	{
+		SPDLOG_DEBUG("Increasing Noise count");
+		noiseCount++;
+	}
+
 	particles = std::move(newParticles);
 	weights.resize(newParticlesSize);
 	numParticles = newParticlesSize;
