@@ -30,10 +30,10 @@ public:
     
     size_t numParticles;
     double movingAverageOfBelief = 0;
-    double windowSize = 10;
+    double windowSize = 5;
     std::vector<Pose2D> particles;
 	int count = 0;
-	int noiseCount = 0;
+	int noiseCount = 10;
 
     std::vector<double> weights;
 	double posVar, thetaVar;

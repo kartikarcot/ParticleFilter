@@ -145,7 +145,7 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
 		double newX, newY, newTheta;
-		if (noiseCount < 10)
+		if (noiseCount < 5)
 		{
 			newX = newParticles[i].x + x_noise(generator);
 			newY = newParticles[i].y + y_noise(generator);
