@@ -25,12 +25,17 @@ ParticleFilter::ParticleFilter(
 						posVar(_posVar),
 						thetaVar(_thetaVar)
 {
-    
-    std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
+    initialise(seed, mp);
+}
+
+void ParticleFilter::initialise(const int &seed, const std::shared_ptr<Map> &mp)
+{
+	std::uniform_real_distribution<double> distX(mp->minX,mp->maxX), distY(mp->minY,mp->maxY), distTheta(-PI, PI);
     std::random_device rd;
     std::mt19937_64 generator(seed);
     size_t numGenerated=0;
 	SPDLOG_INFO("numparticles {}",numParticles);
+    particles.clear();
     while(numGenerated < numParticles)
     {
         double x = distX(generator), y = distY(generator), theta = distTheta(generator);
@@ -40,6 +45,7 @@ ParticleFilter::ParticleFilter(
             numGenerated++;
         }
     }
+
 }
 
 void ParticleFilter::predict()
@@ -79,15 +85,20 @@ void ParticleFilter::resample()
 	return;
 }
 
-void ParticleFilter::updateMovingAverage()
+bool ParticleFilter::updateMovingAverage()
 {
 	double curBelief = 0;
 	for (const auto & weight : weights)
 	{
 		curBelief += weight;
 	}
+	double tempOfPreviousBelief = movingAverageOfBelief;
 	movingAverageOfBelief = movingAverageOfBelief + (curBelief/numParticles - movingAverageOfBelief)/windowSize;
 	SPDLOG_DEBUG("The moving average value and cursum is {}, {}", movingAverageOfBelief, curBelief/numParticles);
+	if (std::abs(tempOfPreviousBelief-movingAverageOfBelief) >= kidnappedThreshold)
+		return true;
+	else
+		return false;
 }
 
 void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const int &seed)
@@ -99,7 +110,17 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 	std::normal_distribution<double> x_noise(0.0,posVar), y_noise(0.0,posVar), theta_noise(0.0,thetaVar);
 
 	// normalize the weights
-	updateMovingAverage();
+	if (updateMovingAverage())
+	{
+		if (initializedSince > 20)
+		{
+			SPDLOG_ERROR("The robot is kidnapped or converged to a wrong place.");
+			initialise(seed, mp);
+			initializedSince = 0;
+		}
+		return;
+	}
+    initializedSince++;
 	normalizeAndShiftWeights(weights);
 	auto maxIter = std::max_element(weights.begin(), weights.end());
 	auto minIter = std::min_element(weights.begin(), weights.end());
@@ -110,24 +131,24 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		cumulativeWeights[i] = cumulativeWeights[i-1] + weights[i];
 
 	int newParticlesSize = numParticles;
-	if (movingAverageOfBelief < -26.5 && count == 0)
+	if (movingAverageOfBelief < increaseParticlesThreshold && particlesChangedSince == 0)
 	{ 
 		SPDLOG_DEBUG("Filter uncertain, increase number of particles");
 		newParticlesSize = 10000;
-		count = 10;
+		particlesChangedSince = 10;
 	}
-	else if (count == 0)
+	else if (particlesChangedSince == 0)
 	{
 		SPDLOG_DEBUG("Filter certain, decrease number of particles");
 		newParticlesSize = 5000;
-		count = 10;
+		particlesChangedSince = 10;
 	}
-	count--;
+	particlesChangedSince--;
 	
-	if (movingAverageOfBelief < -28.5 && noiseCount >= 10)
+	if (movingAverageOfBelief < addNoiseThreshold && noiseAddedSince >= 10)
 	{
 		SPDLOG_DEBUG("Reinitializing Noise Count");
-		noiseCount = 0;
+		noiseAddedSince = 0;
 	}
 
 	// set stepsize based on new length
@@ -145,7 +166,7 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		// calculate the new partcle with some noise
 		newParticles[i] = particles[index];
 		double newX, newY, newTheta;
-		if (noiseCount < 5)
+		if (noiseAddedSince < 5)
 		{
 			newX = newParticles[i].x + x_noise(generator);
 			newY = newParticles[i].y + y_noise(generator);
@@ -160,10 +181,10 @@ void ParticleFilter::lowVarianceResample(const std::shared_ptr<Map> &mp, const i
 		// newParticles[i].theta += theta_noise(generator);
 	}
 
-	if (noiseCount < 10)
+	if (noiseAddedSince < 10)
 	{
 		SPDLOG_DEBUG("Increasing Noise count");
-		noiseCount++;
+		noiseAddedSince++;
 	}
 
 	particles = std::move(newParticles);

@@ -32,8 +32,13 @@ public:
     double movingAverageOfBelief = 0;
     double windowSize = 5;
     std::vector<Pose2D> particles;
-	int count = 0;
-	int noiseCount = 10;
+
+	int particlesChangedSince = 0;
+	int noiseAddedSince = 10;
+	int initializedSince = 0;
+	double increaseParticlesThreshold = -26.5;
+	double addNoiseThreshold = -28.5;
+	double kidnappedThreshold = 3;
 
     std::vector<double> weights;
 	double posVar, thetaVar;
@@ -63,7 +68,8 @@ public:
 	// Low variance resampling technique
 	void lowVarianceResample(const std::shared_ptr<Map> &mp, const int &seed = 0);
 	void lowVarianceResampleTest(const std::shared_ptr<Map> &mp);
-	void updateMovingAverage();
+	bool updateMovingAverage();
+	void initialise(const int &seed, const std::shared_ptr<Map> &mp);
 };
 
 #endif

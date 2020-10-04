@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 		MotionModel motionModel(alphas, seed, odomPreviousMeasure, odomCurrentMeasure);
 
 		#pragma omp parallel for
-		for (std::size_t i = 0; i<particleFilter.particles.size(); i++)
+		for (std::size_t i = 0; i<particleFilter.numParticles; i++)
 		{
 			// auto particlePose = particleFilter.particles[i];
 			// Motion Model update
