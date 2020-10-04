@@ -4,7 +4,7 @@
 	"zHit": 110,
 	"zShort": 40,
 	"zRand": 1000,
-	"zMax": 0.4,
+	"zMax": 0.6,
 	"zHitVar":100,
 	"zLambdaShort":0.001,
 	"raycastingstepsize":2,
@@ -18,6 +18,6 @@
 	"maxrange":8000,
 	"visualizeRays":false,
 	"visualizeMap":true,
-	"posvar":10,
+	"posvar":7,
 	"thetavar":0.02
 }
