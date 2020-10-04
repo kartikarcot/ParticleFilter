@@ -95,7 +95,7 @@ bool ParticleFilter::updateMovingAverage()
 	double tempOfPreviousBelief = movingAverageOfBelief;
 	movingAverageOfBelief = movingAverageOfBelief + (curBelief/numParticles - movingAverageOfBelief)/windowSize;
 	SPDLOG_DEBUG("The moving average value and cursum is {}, {}", movingAverageOfBelief, curBelief/numParticles);
-	if (std::abs(tempOfPreviousBelief-movingAverageOfBelief) >= kidnappedThreshold)
+	if (std::abs(curBelief/numParticles-movingAverageOfBelief) >= kidnappedThreshold)
 		return true;
 	else
 		return false;

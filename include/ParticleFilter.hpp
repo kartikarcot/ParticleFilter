@@ -38,7 +38,7 @@ public:
 	int initializedSince = 0;
 	double increaseParticlesThreshold = -26.5;
 	double addNoiseThreshold = -28.5;
-	double kidnappedThreshold = 3;
+	double kidnappedThreshold = 9;
 
     std::vector<double> weights;
 	double posVar, thetaVar;
