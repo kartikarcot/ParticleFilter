@@ -15,6 +15,3 @@ ENDIF(DEBUG_MODE)
 
 
 add_subdirectory(src)
-if(BUILD_TESTS)
-    add_subdirectory(tests)
-endif(BUILD_TESTS)
