@@ -1,8 +1,3 @@
-## Installation prereqs
-```
-sudo apt-get install libjsoncpp-dev libopencv-dev
-```
-
 ## Commands to run for Mac
 ```
 export CC=gcc
@@ -23,11 +18,7 @@ function pf() {
 }
 ```
 
-## TODO:
-- [ ] Add config file
-- [ ] Add types.h for standard types used like Map and Pose2D
-- [ ] Tune hyperparameters
-- [ ] Add tests in separate directory
+## Plotting stuff
 ```
 rm z_vals.txt && touch z_vals.txt && ./src/testing && gnuplot -e "set terminal svg; set style data lines; plot 'z_vals.txt'" > plot.svg
  gnuplot -e "set terminal svg; set style data lines; plot 'laser.txt' using 1 with lines title 'simulated', 'laser.txt' using 2 with lines title 'log' " > laser.svg
